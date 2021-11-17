@@ -6,8 +6,8 @@
  * @since    1.0.2
  */
 function wp_dz_register_script() {
-	wp_register_style('dropzone', plugin_dir_url(__FILE__) . '../css/dropzone.css');
-	wp_register_script('dropzone', plugin_dir_url(__FILE__) . '../js/dropzone.js');
+	wp_register_style('dropzone', plugin_dir_url(__FILE__) . '../css/dropzone.min.css');
+	wp_register_script('dropzone', plugin_dir_url(__FILE__) . '../js/dropzone.min.js');
 }
 add_action('wp_enqueue_scripts', 'wp_dz_register_script');
 
@@ -40,7 +40,6 @@ function wp_dz_add_shortcode($atts) {
 		'max-files-alert' => '',
 		'auto-process' => '',
 		'upload-button-text' => 'Uplaod',
-		'guest-upload' => '',
 		'dom-id' => '',
 
 		/**
@@ -67,13 +66,17 @@ function wp_dz_add_shortcode($atts) {
 		$id = mt_rand(0, 999);
 	}
 
+	if (!is_user_logged_in()) {
+		$atts['desc'] = __('Please login to upload files.', 'wp-dropzone');
+	}
+
 	$ajax_url = admin_url('admin-ajax.php');
 
 	$html = '<form action="" class="dropzone dropzone-' . $id . '" id="wp-dz-' . $id . '">';
 	if ($atts['title'] || $atts['desc']) {
 		$html .= '<div class="dz-message">
-			<h2>' . $atts['title'] . '</h2>
-			<span class="note">' . $atts['desc'] . '</span>
+			<h3 class="dropzone-title">' . $atts['title'] . '</h3>
+			<p class="dropzone-note">' . $atts['desc'] . '</p>
 			<div class="dropzone-mobile-trigger needsclick"></div>
 		</div>';
 	}
@@ -104,7 +107,7 @@ function wp_dz_add_shortcode($atts) {
 
 		init: function() {
 			' . ($atts['auto-process'] == 'false' ? 'var closure = this; document.getElementById("process-' . $id . '").addEventListener("click", function() { closure.processQueue(); })' : '') . '
-			' . ($atts['guest-upload'] == 'false' ? (!is_user_logged_in() ? 'this.disable();' : '') : '') . '
+			' . (!is_user_logged_in() ? 'this.disable();' : '') . '
 		},
 		success: function(file, response) {
 			' . ($atts['dom-id'] ? 'if(response.error=="false"){document.getElementById("' . $atts['dom-id'] . '").value = response.data}' : '') . '
@@ -193,4 +196,3 @@ function wp_dz_ajax_upload_handle() {
 	}
 }
 add_action('wp_ajax_wp_dz', 'wp_dz_ajax_upload_handle');
-add_action('wp_ajax_nopriv_wp_dz', 'wp_dz_ajax_upload_handle');
