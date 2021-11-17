@@ -2,12 +2,12 @@
 
 /**
  * @package           Wp_Dropzone
- * @version           1.0.5
+ * @version           1.0.6
  * @link              https://profiles.wordpress.org/nazsabuz/
  *
  * Plugin Name:       WP Dropzone
  * Description:       Upload files into WordPress media library from front-end.
- * Version:           1.0.5
+ * Version:           1.0.6
  * Author:            Nazmul Sabuz
  * Author URI:        https://profiles.wordpress.org/nazsabuz/
  * Text Domain:       wp-dropzone
