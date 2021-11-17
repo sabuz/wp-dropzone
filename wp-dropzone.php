@@ -10,6 +10,7 @@
  * Version:           1.0.5
  * Author:            Nazmul Sabuz
  * Author URI:        https://profiles.wordpress.org/nazsabuz/
+ * Text Domain:       wp-dropzone
  */
 
 // If this file is called directly, abort.
