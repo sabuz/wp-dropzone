@@ -151,16 +151,28 @@ add_shortcode('wp-dropzone', 'wp_dz_add_shortcode');
  */
 function wp_dz_ajax_upload_handle() {
 	if (!empty($_FILES) && wp_verify_nonce($_REQUEST['wp_dz_nonce'], 'wp_dz_protect')) {
+		$file = array(
+			'name' => isset($_FILES['file']['name']) ? $_FILES['file']['name'] : '',
+			'type' => isset($_FILES['file']['type']) ? $_FILES['file']['type'] : '',
+			'size' => isset($_FILES['file']['size']) ? $_FILES['file']['size'] : 0,
+		);
+
 		// Including file library if not exist
 		if (!function_exists('wp_handle_upload')) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
+
+		// fire hook before upload.
+		do_action('wp_dropzone_before_upload_file', $file);
 
 		// Uploading file to server
 		$movefile = wp_handle_upload($_FILES['file'], ['test_form' => false]);
 
 		// If uploading success & No error
 		if ($movefile && !isset($movefile['error'])) {
+			// fire hook after upload.
+			do_action('wp_dropzone_after_upload_file', $file);
+
 			$filename = $movefile['file'];
 			$filetype = wp_check_filetype(basename($filename), null);
 			$wp_upload_dir = wp_upload_dir();
@@ -175,6 +187,9 @@ function wp_dz_ajax_upload_handle() {
 
 			// Adding file to media
 			$attach_id = wp_insert_attachment($attachment, $filename);
+
+			// fire hook after insert media.
+			do_action('wp_dropzone_after_insert_attachment', $attach_id);
 
 			// If attachment success
 			if ($attach_id) {
