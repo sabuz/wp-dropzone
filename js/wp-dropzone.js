@@ -1,3 +1,5 @@
+console.log(i18n)
+
 Dropzone.options['wpDz' + i18n.instance_id] = {
 	url: i18n.ajax_url + '?action=wp_dz',
 	paramName: 'file',
