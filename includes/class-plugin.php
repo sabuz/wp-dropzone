@@ -44,9 +44,6 @@ class Plugin {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
 		add_action( 'wp_ajax_wp_dz', array( $this, 'ajax_upload_handle' ) );
 		add_shortcode( 'wp-dropzone', array( $this, 'add_shortcode' ) );
-
-		// init class fliter.
-		// add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
 	}
 
 	/**
@@ -146,7 +143,7 @@ class Plugin {
 	public function add_shortcode( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'id'                 => '',
+				'id'                 => wp_rand( 0, 999 ),
 				'callback'           => '',
 				'title'              => '',
 				'desc'               => '',
@@ -177,64 +174,26 @@ class Plugin {
 			$atts
 		);
 
-		if ( $atts['id'] ) {
-			$id = $atts['id'];
-		} else {
-			$id = wp_rand( 0, 999 );
-		}
-
 		if ( ! is_user_logged_in() ) {
 			$atts['desc'] = __( 'Please login to upload files.', 'wp-dropzone' );
 		}
 
-		$ajax_url = admin_url( 'admin-ajax.php' );
-
-		$html = '<form action="" class="dropzone dropzone-' . $id . '" id="wp-dz-' . $id . '">';
-		if ($atts['title'] || $atts['desc']) {
+		$html = '<form action="" class="dropzone dropzone-' . $atts['id'] . '" id="wp-dz-' . $atts['id'] . '">';
+		if ( $atts['title'] || $atts['desc'] ) {
 			$html .= '<div class="dz-message">
 				<h3 class="dropzone-title">' . $atts['title'] . '</h3>
 				<p class="dropzone-note">' . $atts['desc'] . '</p>
 				<div class="dropzone-mobile-trigger needsclick"></div>
 			</div>';
 		}
+		// $html .= wp_nonce_field('wp_dz_protect', 'wp_dz_nonce') . '
+		$html .= '</form>';
 
-		$html .= wp_nonce_field('wp_dz_protect', 'wp_dz_nonce') . '
-		</form>';
-
-		if ($atts['auto-process'] == 'false') {
-			$html .= '<button class="process-upload" id="process-' . $id . '">' . $atts['upload-button-text'] . '</button>';
+		if ( $atts['auto-process'] == 'false' ) {
+			$html .= '<button class="process-upload" id="process-' . $atts['id'] . '">' . $atts['upload-button-text'] . '</button>';
 		}
 
-		$js = 'Dropzone.options.wpDz' . ucfirst($id) . ' = {
-			url: "' . $ajax_url . '?action=wp_dz",
-			paramName: "file",
-			' . ($atts['max-file-size'] ? 'maxFilesize: ' . $atts['max-file-size'] . ',' : '') . '
-			' . ($atts['remove-links'] ? 'addRemoveLinks: ' . $atts['remove-links'] . ',' : '') . '
-			' . ($atts['clickable'] ? 'clickable: ' . $atts['clickable'] . ',' : '') . '
-			' . ($atts['accepted-files'] ? 'acceptedFiles: "' . $atts['accepted-files'] . '",' : '') . '
-			' . ($atts['auto-process'] ? 'autoProcessQueue: ' . $atts['auto-process'] . ',' : '') . '
-			' . ($atts['max-files'] ? 'maxFiles: ' . $atts['max-files'] . ', maxfilesexceeded: function(file) { this.removeFile(file); ' . ($atts['max-files-alert'] ? 'alert("' . $atts['max-files-alert'] . '");' : '') . ' },' : '') . '
-			' . ($atts['resize-width'] ? 'resizeWidth: ' . $atts['resize-width'] . ',' : '') . '
-			' . ($atts['resize-height'] ? 'resizeHeight: ' . $atts['resize-height'] . ',' : '') . '
-			' . ($atts['resize-quality'] ? 'resizeQuality: ' . $atts['resize-quality'] . ',' : '') . '
-			' . ($atts['resize-method'] ? 'resizeMethod: "' . $atts['resize-method'] . '",' : '') . '
-			' . ($atts['thumbnail-width'] ? 'thumbnailWidth: ' . $atts['thumbnail-width'] . ',' : '') . '
-			' . ($atts['thumbnail-height'] ? 'thumbnailHeight: ' . $atts['thumbnail-height'] . ',' : '') . '
-			' . ($atts['thumbnail-method'] ? 'thumbnailMethod: "' . $atts['thumbnail-method'] . '",' : '') . '
-			' . ($atts['chunking'] ? 'chunking: "' . $atts['chunking'] . '",' : '') . '
-			' . ($atts['chunk-size'] ? 'chunkSize: "' . $atts['chunk-size'] . '",' : '') . '
-
-			init: function() {
-				' . ($atts['auto-process'] == 'false' ? 'var closure = this; document.getElementById("process-' . $id . '").addEventListener("click", function() { closure.processQueue(); })' : '') . '
-				' . (!is_user_logged_in() ? 'this.disable();' : '') . '
-			},
-			success: function(file, response) {
-				' . ($atts['dom-id'] ? 'if(response.error=="false"){document.getElementById("' . $atts['dom-id'] . '").value = response.data}' : '') . '
-			},
-			' . ($atts['callback'] ? $atts['callback'] : '') . '
-		};';
-
-		$css = '.dropzone-' . $id . ' {
+		$css = '.dropzone-' . $atts['id'] . ' {
 			' . ($atts['border-width'] ? 'border-width: ' . $atts['border-width'] . ';' : '') . '
 			' . ($atts['border-style'] ? 'border-style: ' . $atts['border-style'] . ';' : '') . '
 			' . ($atts['border-color'] ? 'border-color: ' . $atts['border-color'] . ';' : '') . '
@@ -243,7 +202,7 @@ class Plugin {
 		}';
 
 		if ($atts['thumbnail-width'] || $atts['thumbnail-height']) {
-			$css .= '.dropzone-' . $id . ' .dz-preview .dz-image {
+			$css .= '.dropzone-' . $atts['id'] . ' .dz-preview .dz-image {
 				' . ($atts['thumbnail-width'] ? 'width:100%;max-width: ' . $atts['thumbnail-width'] . 'px;' : '') . '
 				' . ($atts['thumbnail-height'] ? 'height:auto;max-height: ' . $atts['thumbnail-width'] . 'px;' : '') . '
 			}';
@@ -263,8 +222,8 @@ class Plugin {
 					'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
 					'size_limit'        => ini_get( 'upload_max_filesize' ),
 					'is_user_logged_in' => is_user_logged_in(),
-					'instance_id'       => ucfirst( $id ),
 					'id'                => $atts['id'],
+					'instance_id'       => ucfirst( $atts['id'] ),
 					'callback'          => $atts['callback'],
 					'title'             => $atts['title'],
 					'desc'              => $atts['desc'],
@@ -289,8 +248,6 @@ class Plugin {
 				$atts
 			)
 		);
-
-		// wp_add_inline_script( 'dropzone', $js );
 
 		return $html;
 	}
