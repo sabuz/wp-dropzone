@@ -64,6 +64,7 @@ class Plugin {
 	 * @since    1.0.0
 	 */
 	public function ajax_upload_handle() {
+		// phpcs:ignore
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_dropzone_nonce' ) ) {
 			return;
 		}
@@ -77,6 +78,7 @@ class Plugin {
 			wp_send_json( $message );
 		}
 
+		// phpcs:ignore
 		$file = $_FILES['file'];
 
 		// include file library if not exist.
