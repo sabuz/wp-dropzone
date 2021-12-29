@@ -108,22 +108,22 @@ class Plugin {
 			);
 
 			// add file to media.
-			$attach_id = wp_insert_attachment( $attachment, $filename );
+			$attachment_id = wp_insert_attachment( $attachment, $filename );
 
 			// fire hook after insert media.
-			do_action( 'wp_dropzone_after_insert_attachment', $attach_id );
+			do_action( 'wp_dropzone_after_insert_attachment', $attachment_id );
 
 			// if attachment success.
-			if ( $attach_id ) {
+			if ( $attachment_id ) {
 				require_once ABSPATH . 'wp-admin/includes/image.php';
 
 				// update attachment metadata.
-				$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-				wp_update_attachment_metadata( $attach_id, $attach_data );
+				$attachment_data = wp_generate_attachment_metadata( $attachment_id, $filename );
+				wp_update_attachment_metadata( $attachment_id, $attachment_data );
 			}
 
 			$message['error'] = false;
-			$message['data']  = wp_get_attachment_url( $attach_id );
+			$message['data']  = wp_get_attachment_url( $attachment_id );
 		} else {
 			$message['data'] = $movefile['error'];
 		}
