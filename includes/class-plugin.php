@@ -152,13 +152,13 @@ class Plugin {
 				'border-color'       => '',
 				'background'         => '',
 				'margin-bottom'      => '',
-				'max-file-size'      => '',
-				'remove-links'       => false,
-				'clickable'          => true,
+				'max-file-size'      => (int) ini_get( 'upload_max_filesize' ) * 1000000,
+				'remove-links'       => 'false',
+				'clickable'          => 'true',
 				'accepted-files'     => null,
 				'max-files'          => null,
-				'max-files-alert'    => '',
-				'auto-process'       => true,
+				'max-files-alert'    => __( 'Max file limit excedeed.', 'wp-dropzone' ),
+				'auto-process'       => 'true',
 				'upload-button-text' => __( 'Uplaod', 'wp-dropzone' ),
 				'dom-id'             => '',
 				'resize-width'       => null,
@@ -168,7 +168,7 @@ class Plugin {
 				'thumbnail-width'    => 120,
 				'thumbnail-height'   => 120,
 				'thumbnail-method'   => 'crop',
-				'chunking'           => false,
+				'chunking'           => 'false',
 				'chunk-size'         => 2000000,
 			),
 			$atts
@@ -186,10 +186,10 @@ class Plugin {
 				<div class="dropzone-mobile-trigger needsclick"></div>
 			</div>';
 		}
-		// $html .= wp_nonce_field('wp_dz_protect', 'wp_dz_nonce') . '
+		$html .= wp_nonce_field('wp_dz_protect', 'wp_dz_nonce');
 		$html .= '</form>';
 
-		if ( $atts['auto-process'] == 'false' ) {
+		if ( 'false' === $atts['auto-process'] ) {
 			$html .= '<button class="process-upload" id="process-' . $atts['id'] . '">' . $atts['upload-button-text'] . '</button>';
 		}
 
@@ -219,7 +219,6 @@ class Plugin {
 			array(
 				'ajax_url'          => admin_url( 'admin-ajax.php' ),
 				'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
-				'size_limit'        => ini_get( 'upload_max_filesize' ),
 				'is_user_logged_in' => is_user_logged_in(),
 				'id'                => $atts['id'],
 				'instance_id'       => ucfirst( $atts['id'] ),
@@ -228,11 +227,11 @@ class Plugin {
 				'desc'              => $atts['desc'],
 				'max_file_size'     => $atts['max-file-size'],
 				'remove_links'      => $atts['remove-links'],
-				'clickable'         => $atts['clickable'],
+				'clickable'         => (bool) $atts['clickable'],
 				'accepted_files'    => $atts['accepted-files'],
 				'max_files'         => $atts['max-files'],
 				'max_files_alert'   => $atts['max-files-alert'],
-				'auto_process'      => $atts['auto-process'],
+				'auto_process'      => (bool) $atts['auto-process'],
 				'dom_id'            => $atts['dom-id'],
 				'resize_width'      => $atts['resize-width'],
 				'resize_height'     => $atts['resize-height'],
