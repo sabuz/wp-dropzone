@@ -44,14 +44,15 @@ Dropzone.options['wpDz' + i18n.instance_id] = {
 		});
 
 		// callback
-		var callbacks = i18n.callback.split(/}\s?,/);
+		var callbacks = i18n.callback.replace(/(})\s?,/, '},##').split(',##');
 
 		if (callbacks.length > 0) {
 			callbacks.forEach(function (callback) {
 				callback = callback.trim().split(/\s?:\s?/);
 
 				if (callback.length === 2) {
-					closure.on(callback[0], callback[1]);
+					eval('var func = ' + callback[1]);
+					closure.on(callback[0], func);
 				}
 			});
 		}
