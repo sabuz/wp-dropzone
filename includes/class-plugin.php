@@ -64,7 +64,7 @@ class Plugin {
 	 * @since    1.0.0
 	 */
 	public function ajax_upload_handle() {
-		if ( ! wp_verify_nonce( $_POST['wp_dz_nonce'], 'wp_dz_protect' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_dropzone_nonce' ) ) {
 			return;
 		}
 
@@ -186,7 +186,7 @@ class Plugin {
 				<div class="dropzone-mobile-trigger needsclick"></div>
 			</div>';
 		}
-		$html .= wp_nonce_field('wp_dz_protect', 'wp_dz_nonce');
+		// $html .= wp_nonce_field('wp_dz_protect', 'wp_dz_nonce');
 		$html .= '</form>';
 
 		if ( 'false' === $atts['auto-process'] ) {

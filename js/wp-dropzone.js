@@ -1,4 +1,4 @@
-console.log(i18n)
+console.log(i18n);
 
 Dropzone.options['wpDz' + i18n.instance_id] = {
 	url: i18n.ajax_url + '?action=wp_dz',
@@ -36,6 +36,10 @@ Dropzone.options['wpDz' + i18n.instance_id] = {
 		if (i18n.is_user_logged_in !== '1') {
 			this.disable();
 		}
+
+		this.on('sending', function (file, xhr, data) {
+			data.append('nonce', i18n.nonce);
+		});
 	},
 	success: function (file, response) {
 		if (i18n.dom_id.length > 0) {
