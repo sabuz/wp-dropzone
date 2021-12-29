@@ -42,7 +42,7 @@ class Plugin {
 
 		// init class actions.
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
-		add_action( 'wp_ajax_wp_dz', array( $this, 'ajax_upload_handle' ) );
+		add_action( 'wp_ajax_wp_dropzone_upload_media', array( $this, 'ajax_upload_handle' ) );
 		add_shortcode( 'wp-dropzone', array( $this, 'add_shortcode' ) );
 	}
 
