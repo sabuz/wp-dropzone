@@ -1,0 +1,8 @@
+.DS_Store
+.vscode
+*.log
+composer.lock
+package-lock.json
+index.js.map
+/vendor/
+/node_modules/
