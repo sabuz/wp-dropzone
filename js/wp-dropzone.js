@@ -7,13 +7,6 @@ Dropzone.options['wpDz' + i18n.instance_id] = {
 	acceptedFiles: i18n.accepted_files,
 	autoProcessQueue: Boolean(i18n.auto_process),
 	maxFiles: i18n.max_files,
-	maxfilesexceeded: function (file) {
-		this.removeFile(file);
-
-		if (i18n.max_files_alert) {
-			alert(i18n.max_files_alert);
-		}
-	},
 	resizeWidth: i18n.resize_width,
 	resizeHeight: i18n.resize_height,
 	resizeQuality: i18n.resize_quality,
@@ -38,11 +31,6 @@ Dropzone.options['wpDz' + i18n.instance_id] = {
 			this.disable();
 		}
 
-		// send nonce token
-		this.on('sending', function (file, xhr, data) {
-			data.append('nonce', i18n.nonce);
-		});
-
 		// callback
 		var callbacks = i18n.callback.replace(/(})\s?,/, '},##').split(',##');
 
@@ -55,6 +43,20 @@ Dropzone.options['wpDz' + i18n.instance_id] = {
 					closure.on(callback[0], func);
 				}
 			});
+		}
+	},
+	sending: function (file, xhr, data) {
+		data.append('nonce', i18n.nonce);
+	},
+	sendingmultiple: function (file, xhr, data) {},
+	chunksUploaded: function (file, done) {
+		console.log(file);
+	},
+	maxfilesexceeded: function (file) {
+		this.removeFile(file);
+
+		if (i18n.max_files_alert) {
+			alert(i18n.max_files_alert);
 		}
 	},
 	success: function (file, response) {

@@ -47,7 +47,7 @@ class Plugin {
 	}
 
 	/**
-	 * Register the required asset files for this plugin.
+	 * Enqueue the required asset files for this plugin.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -68,6 +68,8 @@ class Plugin {
 	 * @since    1.0.0
 	 */
 	public function ajax_upload_handle() {
+		global $wp_filesystem;
+
 		// phpcs:ignore
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_dropzone_nonce' ) ) {
 			return;
@@ -84,6 +86,23 @@ class Plugin {
 
 		// phpcs:ignore
 		$file = $_FILES['file'];
+
+		// chunk.
+		if ( isset( $_POST['dzchunkindex'] ) && isset( $_POST['dztotalchunkcount'] ) ) {
+			$total_chunks = intval( $_POST['dztotalchunkcount'] );
+			$chunk_index  = intval( $_POST['dzchunkindex'] ) + 1;
+			$uploads      = wp_upload_dir();
+
+			// open file.
+			$tmp_file = $uploads['path'] . DIRECTORY_SEPARATOR . md5( $file['name'] );
+
+			// $content = $wp_filesystem->put_contents( $file['tmp_name'] );
+			file_put_contents( $tmp_file, file_get_contents( $file['tmp_name'] ), FILE_APPEND );
+
+			if ( $total_chunks !== $chunk_index ) {
+				return;
+			}
+		}
 
 		// include file library if not exist.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
@@ -172,7 +191,7 @@ class Plugin {
 				'thumbnail-width'    => 120,
 				'thumbnail-height'   => 120,
 				'thumbnail-method'   => 'crop',
-				'chunking'           => 'false',
+				'chunking'           => 'true',
 				'chunk-size'         => 2000000,
 			),
 			$atts
