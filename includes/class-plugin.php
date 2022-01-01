@@ -41,7 +41,7 @@ class Plugin {
 		$this->url = $url;
 
 		// init class actions.
-		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wp_ajax_wp_dropzone_upload_media', array( $this, 'ajax_upload_handle' ) );
 		add_shortcode( 'wp-dropzone', array( $this, 'add_shortcode' ) );
 	}
@@ -52,10 +52,14 @@ class Plugin {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function register_scripts() {
-		wp_register_style( 'dropzone', $this->url . 'css/dropzone.min.css', array(), '1.0.8' );
-		wp_register_script( 'dropzone', $this->url . 'js/dropzone.min.js', array(), '1.0.8', true );
-		wp_register_script( 'wp-dropzone', $this->url . 'js/wp-dropzone.js', array( 'dropzone' ), '1.0.8', true );
+	public function enqueue_scripts() {
+		global $post;
+
+		if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wp-dropzone' ) ) {
+			wp_enqueue_style( 'dropzone', $this->url . 'css/dropzone.min.css', array(), '1.0.8' );
+			wp_enqueue_script( 'dropzone', $this->url . 'js/dropzone.min.js', array(), '1.0.8', true );
+			wp_enqueue_script( 'wp-dropzone', $this->url . 'js/wp-dropzone.js', array( 'dropzone' ), '1.0.8', true );
+		}
 	}
 
 	/**
@@ -221,10 +225,9 @@ class Plugin {
 		}
 
 		// enqueue scripts.
-		wp_enqueue_style( 'dropzone' );
 		wp_add_inline_style( 'dropzone', $css );
 
-		wp_enqueue_script( 'wp-dropzone' );
+		// localize.
 		wp_localize_script(
 			'wp-dropzone',
 			'i18n',
