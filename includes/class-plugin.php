@@ -9,6 +9,8 @@ namespace NazSabuz\WPDropzone;
 
 defined( 'ABSPATH' ) || exit;
 
+use WP_Filesystem_Direct;
+
 /**
  * The main class for loading plugin features
  */
@@ -40,10 +42,26 @@ class Plugin {
 		$this->dir = $dir;
 		$this->url = $url;
 
+		// load dependencies.
+		$this->load_dependencies();
+
 		// init class actions.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wp_ajax_wp_dropzone_upload_media', array( $this, 'ajax_upload_handle' ) );
 		add_shortcode( 'wp-dropzone', array( $this, 'add_shortcode' ) );
+	}
+
+	/**
+	 * Load dependency files.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function load_dependencies() {
+		if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		}
 	}
 
 	/**
@@ -68,8 +86,6 @@ class Plugin {
 	 * @since    1.0.0
 	 */
 	public function ajax_upload_handle() {
-		global $wp_filesystem;
-
 		// phpcs:ignore
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_dropzone_nonce' ) ) {
 			return;
@@ -88,20 +104,26 @@ class Plugin {
 		$file = $_FILES['file'];
 
 		// chunk.
-		if ( isset( $_POST['dzchunkindex'] ) && isset( $_POST['dztotalchunkcount'] ) ) {
-			$total_chunks = intval( $_POST['dztotalchunkcount'] );
-			$chunk_index  = intval( $_POST['dzchunkindex'] ) + 1;
-			$uploads      = wp_upload_dir();
+		if ( isset( $_POST['dzuuid'] ) && isset( $_POST['dzchunkindex'] ) && isset( $_POST['dztotalchunkcount'] ) ) {
+			$uid           = trim( sanitize_text_field( wp_unslash( $_POST['dzuuid'] ) ) );
+			$total_chunks  = intval( $_POST['dztotalchunkcount'] );
+			$chunk_index   = intval( $_POST['dzchunkindex'] ) + 1;
+			$uploads       = wp_upload_dir();
+			$wp_filesystem = new WP_Filesystem_Direct( null );
 
 			// open file.
-			$tmp_file = $uploads['path'] . DIRECTORY_SEPARATOR . md5( $file['name'] );
+			$tmp_file = $uploads['path'] . DIRECTORY_SEPARATOR . $file['name'];
+			$contents = $wp_filesystem->get_contents( $tmp_file ) . $wp_filesystem->get_contents( $file['tmp_name'] );
 
-			// $content = $wp_filesystem->put_contents( $file['tmp_name'] );
-			file_put_contents( $tmp_file, file_get_contents( $file['tmp_name'] ), FILE_APPEND );
+			$wp_filesystem->put_contents( $tmp_file, $contents, false );
 
 			if ( $total_chunks !== $chunk_index ) {
 				return;
 			}
+
+			$file['tmp_name'] = tempnam($tmp_file);
+			$file['type']     = $_POST['origtype'];
+			$file['size']     = $wp_filesystem->size( $tmp_file );
 		}
 
 		// include file library if not exist.
@@ -114,6 +136,8 @@ class Plugin {
 
 		// upload file to server.
 		$movefile = wp_handle_upload( $file, array( 'test_form' => false ) );
+		error_log(print_r($file,1));
+		error_log(print_r($movefile,1));
 
 		// if upload success & no error.
 		if ( $movefile && ! isset( $movefile['error'] ) ) {

@@ -47,8 +47,10 @@ Dropzone.options['wpDz' + i18n.instance_id] = {
 	},
 	sending: function (file, xhr, data) {
 		data.append('nonce', i18n.nonce);
+		data.append('origtype', file.type);
 	},
-	sendingmultiple: function (file, xhr, data) {},
+	sendingmultiple: function (file, xhr, data) {
+	},
 	chunksUploaded: function (file, done) {
 		console.log(file);
 	},
