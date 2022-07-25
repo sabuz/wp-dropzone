@@ -188,7 +188,7 @@ class Plugin {
 	public function add_shortcode( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'id'                 => wp_rand( 0, 999 ),
+				'id'                 => bin2hex( random_bytes( 2 ) ),
 				'callback'           => '',
 				'title'              => '',
 				'desc'               => '',
