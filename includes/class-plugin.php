@@ -213,8 +213,6 @@ class Plugin {
 				'thumbnail-width'    => 120,
 				'thumbnail-height'   => 120,
 				'thumbnail-method'   => 'crop',
-				'chunking'           => 'true',
-				'chunk-size'         => 2000000,
 			),
 			$atts
 		);
@@ -283,11 +281,11 @@ class Plugin {
 				'desc'              => $atts['desc'],
 				'max_file_size'     => $atts['max-file-size'],
 				'remove_links'      => $atts['remove-links'],
-				'clickable'         => (bool) $atts['clickable'],
+				'clickable'         => $atts['clickable'],
 				'accepted_files'    => $atts['accepted-files'],
 				'max_files'         => $atts['max-files'],
 				'max_files_alert'   => $atts['max-files-alert'],
-				'auto_process'      => (bool) $atts['auto-process'],
+				'auto_process'      => $atts['auto-process'],
 				'dom_id'            => $atts['dom-id'],
 				'resize_width'      => $atts['resize-width'],
 				'resize_height'     => $atts['resize-height'],
@@ -296,8 +294,6 @@ class Plugin {
 				'thumbnail_width'   => $atts['thumbnail-width'],
 				'thumbnail_height'  => $atts['thumbnail-height'],
 				'thumbnail_method'  => $atts['thumbnail-method'],
-				'chunking'          => (bool) $atts['chunking'],
-				'chunk_size'        => $atts['chunk-size'],
 			)
 		);
 
