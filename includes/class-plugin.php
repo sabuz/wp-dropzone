@@ -121,7 +121,7 @@ class Plugin {
 				return;
 			}
 
-			$file['tmp_name'] = tempnam($tmp_file);
+			$file['tmp_name'] = tempnam( $tmp_file );
 			$file['type']     = $_POST['origtype'];
 			$file['size']     = $wp_filesystem->size( $tmp_file );
 		}
@@ -136,8 +136,6 @@ class Plugin {
 
 		// upload file to server.
 		$movefile = wp_handle_upload( $file, array( 'test_form' => false ) );
-		error_log(print_r($file,1));
-		error_log(print_r($movefile,1));
 
 		// if upload success & no error.
 		if ( $movefile && ! isset( $movefile['error'] ) ) {
