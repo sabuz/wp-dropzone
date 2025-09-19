@@ -2,10 +2,10 @@
 /**
  * Plugin class
  *
- * @package NazSabuz/WPDropzone
+ * @package WP_Dropzone
  */
 
-namespace NazSabuz\WPDropzone;
+namespace WP_Dropzone;
 
 defined( 'ABSPATH' ) || exit;
 

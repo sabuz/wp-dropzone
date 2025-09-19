@@ -7,7 +7,7 @@
  * Author URI: https://profiles.wordpress.org/nazsabuz/
  * Text Domain: wp-dropzone
  *
- * @package NazSabuz/WPDropzone
+ * @package WP_Dropzone
  */
 
 // If this file is called directly, abort.
@@ -17,4 +17,4 @@ defined( 'ABSPATH' ) || exit;
 require_once 'includes/class-plugin.php';
 
 // kickstart.
-new NazSabuz\WPDropzone\Plugin( __DIR__, plugin_dir_url( __FILE__ ) );
+new WP_Dropzone\Plugin( __DIR__, plugin_dir_url( __FILE__ ) );
