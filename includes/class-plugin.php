@@ -79,8 +79,9 @@ class Plugin {
 	 * @since    1.0.0
 	 */
 	public function ajax_upload_handle() {
-		// phpcs:ignore
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_dropzone_nonce' ) ) {
+		// Verify nonce for security.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_dropzone_nonce' ) ) {
+			wp_send_json_error( __( 'Security check failed.', 'wp-dropzone' ) );
 			return;
 		}
 
@@ -264,7 +265,7 @@ class Plugin {
 			'wp-dropzone',
 			'wpDzI18n',
 			[
-				'ajax_url'          => admin_url( 'admin-ajax.php' ),
+				'ajax_url'          => esc_url( admin_url( 'admin-ajax.php' ) ),
 				'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
 				'is_user_logged_in' => is_user_logged_in(),
 				'id'                => $atts['id'],
