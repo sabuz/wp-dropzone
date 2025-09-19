@@ -269,7 +269,7 @@ class Plugin {
 		// localize.
 		wp_localize_script(
 			'wp-dropzone',
-			'i18n',
+			'wpDzI18n',
 			array(
 				'ajax_url'          => admin_url( 'admin-ajax.php' ),
 				'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
