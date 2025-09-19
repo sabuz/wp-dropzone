@@ -16,32 +16,12 @@ use WP_Filesystem_Direct;
  */
 class Plugin {
 	/**
-	 * Plugin file path
-	 *
-	 * @var string
-	 */
-	protected $dir;
-
-	/**
-	 * Plugin dir path
-	 *
-	 * @var string
-	 */
-	protected $url;
-
-	/**
 	 * Register class hooks
 	 *
-	 * @since 1.0.0
-	 * @param string $dir plugin dir path.
-	 * @param string $url plugin dir url.
+	 * @since 1.1.0
 	 * @return void
 	 */
-	public function __construct( $dir, $url ) {
-		// init class properties.
-		$this->dir = $dir;
-		$this->url = $url;
-
+	public function __construct() {
 		// load dependencies.
 		$this->load_dependencies();
 
@@ -74,9 +54,9 @@ class Plugin {
 		global $post;
 
 		if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wp-dropzone' ) ) {
-			wp_enqueue_style( 'dropzone', $this->url . 'css/dropzone.min.css', array(), '1.0.8' );
-			wp_enqueue_script( 'dropzone', $this->url . 'js/dropzone.min.js', array(), '1.0.8', true );
-			wp_enqueue_script( 'wp-dropzone', $this->url . 'js/wp-dropzone.js', array( 'dropzone' ), '1.0.8', true );
+			wp_enqueue_style( 'dropzone', WP_DROPZONE_URL . 'css/dropzone.min.css', array(), WP_DROPZONE_VERSION );
+			wp_enqueue_script( 'dropzone', WP_DROPZONE_URL . 'js/dropzone.min.js', array(), WP_DROPZONE_VERSION, true );
+			wp_enqueue_script( 'wp-dropzone', WP_DROPZONE_URL . 'js/wp-dropzone.js', array( 'dropzone' ), WP_DROPZONE_VERSION, true );
 		}
 	}
 
