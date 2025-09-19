@@ -25,6 +25,9 @@ class Plugin {
 		// load dependencies.
 		$this->load_dependencies();
 
+		// load text domain.
+		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+
 		// init class actions.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wp_ajax_wp_dropzone_upload_media', array( $this, 'ajax_upload_handle' ) );
@@ -42,6 +45,16 @@ class Plugin {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
 			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 		}
+	}
+
+	/**
+	 * Load plugin text domain for translations.
+	 *
+	 * @since 1.1.0
+	 * @return void
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain( 'wp-dropzone', false, dirname( WP_DROPZONE_BASENAME ) . '/languages/' );
 	}
 
 	/**
