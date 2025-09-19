@@ -1,41 +1,53 @@
 <?php
 /**
- * Plugin class
+ * Main Plugin Class
+ *
+ * Handles file uploads, shortcode rendering, and WordPress integration
+ * for the WP Dropzone plugin.
  *
  * @package WP_Dropzone
+ * @since   1.0.0
  */
 
 namespace WP_Dropzone;
 
-defined( 'ABSPATH' ) || exit;
+// If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+	die;
+}
 
 use WP_Filesystem_Direct;
 
 /**
- * The main class for loading plugin features
+ * Main Plugin Class
+ *
+ * Coordinates plugin functionality including file uploads, asset loading,
+ * and shortcode rendering.
+ *
+ * @since 1.0.0
  */
 class Plugin {
 	/**
-	 * Register class hooks
+	 * Initialize plugin hooks and actions
 	 *
 	 * @since 1.1.0
 	 * @return void
 	 */
 	public function __construct() {
-		// load dependencies.
+		// Load dependencies.
 		$this->load_dependencies();
 
-		// load text domain.
+		// Load text domain for translations.
 		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
 
-		// init class actions.
+		// Initialize plugin actions.
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'wp_ajax_wp_dropzone_upload_media', [ $this, 'ajax_upload_handle' ] );
 		add_shortcode( 'wp-dropzone', [ $this, 'add_shortcode' ] );
 	}
 
 	/**
-	 * Load dependency files.
+	 * Load required WordPress filesystem classes
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -48,7 +60,7 @@ class Plugin {
 	}
 
 	/**
-	 * Load plugin text domain for translations.
+	 * Load plugin text domain for translations
 	 *
 	 * @since 1.1.0
 	 * @return void
@@ -58,7 +70,7 @@ class Plugin {
 	}
 
 	/**
-	 * Enqueue the required asset files for this plugin.
+	 * Enqueue scripts and styles for pages with shortcode
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -74,9 +86,13 @@ class Plugin {
 	}
 
 	/**
-	 * Handle ajax file upload to media library.
+	 * Handle AJAX file upload to WordPress media library
 	 *
-	 * @since    1.0.0
+	 * Processes file uploads including chunked uploads for large files.
+	 * Includes security verification and media library integration.
+	 *
+	 * @since 1.0.0
+	 * @return void
 	 */
 	public function ajax_upload_handle() {
 		// Verify nonce for security.
@@ -97,7 +113,7 @@ class Plugin {
 		// phpcs:ignore
 		$file = $_FILES['file'];
 
-		// chunk.
+		// Handle chunked uploads.
 		if ( isset( $_POST['dzuuid'] ) && isset( $_POST['dzchunkindex'] ) && isset( $_POST['dztotalchunkcount'] ) ) {
 			$uid           = trim( sanitize_text_field( wp_unslash( $_POST['dzuuid'] ) ) );
 			$total_chunks  = intval( $_POST['dztotalchunkcount'] );
@@ -105,7 +121,7 @@ class Plugin {
 			$uploads       = wp_upload_dir();
 			$wp_filesystem = new WP_Filesystem_Direct( null );
 
-			// open file.
+			// Combine file chunks.
 			$tmp_file = $uploads['path'] . DIRECTORY_SEPARATOR . $file['name'];
 			$contents = $wp_filesystem->get_contents( $tmp_file ) . $wp_filesystem->get_contents( $file['tmp_name'] );
 
@@ -120,20 +136,20 @@ class Plugin {
 			$file['size']     = $wp_filesystem->size( $tmp_file );
 		}
 
-		// include file library if not exist.
+		// Include WordPress file handling library.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		// fire hook before upload.
+		// Fire hook before upload.
 		do_action( 'wp_dropzone_before_upload_file', $file );
 
-		// upload file to server.
+		// Upload file to server.
 		$movefile = wp_handle_upload( $file, [ 'test_form' => false ] );
 
-		// if upload success & no error.
+		// Handle successful upload.
 		if ( $movefile && ! isset( $movefile['error'] ) ) {
-			// fire hook after upload.
+			// Fire hook after upload.
 			do_action( 'wp_dropzone_after_upload_file', $file );
 
 			$filename      = $movefile['file'];
@@ -148,17 +164,16 @@ class Plugin {
 				'post_status'    => 'inherit',
 			];
 
-			// add file to media.
+			// Add file to media library.
 			$attachment_id = wp_insert_attachment( $attachment, $filename );
 
-			// fire hook after insert media.
+			// Fire hook after media insertion.
 			do_action( 'wp_dropzone_after_insert_attachment', $attachment_id );
 
-			// if attachment success.
+			// Generate attachment metadata.
 			if ( $attachment_id ) {
 				require_once ABSPATH . 'wp-admin/includes/image.php';
 
-				// update attachment metadata.
 				$attachment_data = wp_generate_attachment_metadata( $attachment_id, $filename );
 				wp_update_attachment_metadata( $attachment_id, $attachment_data );
 			}
@@ -173,11 +188,11 @@ class Plugin {
 	}
 
 	/**
-	 * Add wp-dropzone shortcode.
+	 * Render wp-dropzone shortcode with customizable options
 	 *
 	 * @since 1.0.0
-	 * @param array $atts attributes passed to shortcode.
-	 * @return string
+	 * @param array $atts Shortcode attributes.
+	 * @return string HTML output for dropzone form
 	 */
 	public function add_shortcode( $atts ) {
 		$atts = shortcode_atts(
@@ -229,7 +244,7 @@ class Plugin {
 			$html .= '<button class="process-upload" id="process-' . esc_attr( $atts['id'] ) . '">' . esc_html( $atts['upload-button-text'] ) . '</button>';
 		}
 
-		// inline css.
+		// Generate inline CSS for styling.
 		$css = '.dropzone-' . $atts['id'] . ' {';
 		if ( ! empty( $atts['border-width'] ) ) {
 			$css .= 'border-width: ' . $atts['border-width'] . ';';
@@ -257,10 +272,10 @@ class Plugin {
 			}';
 		}
 
-		// enqueue scripts.
+		// Add inline styles.
 		wp_add_inline_style( 'dropzone', $css );
 
-		// localize.
+		// Localize script data.
 		wp_localize_script(
 			'wp-dropzone',
 			'wpDzI18n',
