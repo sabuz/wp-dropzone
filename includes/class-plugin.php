@@ -26,12 +26,12 @@ class Plugin {
 		$this->load_dependencies();
 
 		// load text domain.
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
 
 		// init class actions.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_action( 'wp_ajax_wp_dropzone_upload_media', array( $this, 'ajax_upload_handle' ) );
-		add_shortcode( 'wp-dropzone', array( $this, 'add_shortcode' ) );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		add_action( 'wp_ajax_wp_dropzone_upload_media', [ $this, 'ajax_upload_handle' ] );
+		add_shortcode( 'wp-dropzone', [ $this, 'add_shortcode' ] );
 	}
 
 	/**
@@ -67,9 +67,9 @@ class Plugin {
 		global $post;
 
 		if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wp-dropzone' ) ) {
-			wp_enqueue_style( 'dropzone', WP_DROPZONE_URL . 'css/dropzone.min.css', array(), WP_DROPZONE_VERSION );
-			wp_enqueue_script( 'dropzone', WP_DROPZONE_URL . 'js/dropzone.min.js', array(), WP_DROPZONE_VERSION, true );
-			wp_enqueue_script( 'wp-dropzone', WP_DROPZONE_URL . 'js/wp-dropzone.js', array( 'dropzone' ), WP_DROPZONE_VERSION, true );
+			wp_enqueue_style( 'dropzone', WP_DROPZONE_URL . 'css/dropzone.min.css', [], WP_DROPZONE_VERSION );
+			wp_enqueue_script( 'dropzone', WP_DROPZONE_URL . 'js/dropzone.min.js', [], WP_DROPZONE_VERSION, true );
+			wp_enqueue_script( 'wp-dropzone', WP_DROPZONE_URL . 'js/wp-dropzone.js', [ 'dropzone' ], WP_DROPZONE_VERSION, true );
 		}
 	}
 
@@ -84,10 +84,10 @@ class Plugin {
 			return;
 		}
 
-		$message = array(
+		$message = [
 			'error' => true,
 			'data'  => __( 'no file to upload.', 'wp-dropzone' ),
-		);
+		];
 
 		if ( ! isset( $_FILES['file'] ) || empty( $_FILES['file'] ) ) {
 			wp_send_json( $message );
@@ -128,7 +128,7 @@ class Plugin {
 		do_action( 'wp_dropzone_before_upload_file', $file );
 
 		// upload file to server.
-		$movefile = wp_handle_upload( $file, array( 'test_form' => false ) );
+		$movefile = wp_handle_upload( $file, [ 'test_form' => false ] );
 
 		// if upload success & no error.
 		if ( $movefile && ! isset( $movefile['error'] ) ) {
@@ -139,13 +139,13 @@ class Plugin {
 			$filetype      = wp_check_filetype( basename( $filename ), null );
 			$wp_upload_dir = wp_upload_dir();
 
-			$attachment = array(
+			$attachment = [
 				'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
 				'post_mime_type' => $filetype['type'],
 				'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
 				'post_content'   => '',
 				'post_status'    => 'inherit',
-			);
+			];
 
 			// add file to media.
 			$attachment_id = wp_insert_attachment( $attachment, $filename );
@@ -180,7 +180,7 @@ class Plugin {
 	 */
 	public function add_shortcode( $atts ) {
 		$atts = shortcode_atts(
-			array(
+			[
 				'id'                 => bin2hex( random_bytes( 2 ) ),
 				'callback'           => '',
 				'title'              => '',
@@ -206,7 +206,7 @@ class Plugin {
 				'thumbnail-width'    => 120,
 				'thumbnail-height'   => 120,
 				'thumbnail-method'   => 'crop',
-			),
+			],
 			$atts
 		);
 
@@ -263,7 +263,7 @@ class Plugin {
 		wp_localize_script(
 			'wp-dropzone',
 			'wpDzI18n',
-			array(
+			[
 				'ajax_url'          => admin_url( 'admin-ajax.php' ),
 				'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
 				'is_user_logged_in' => is_user_logged_in(),
@@ -287,7 +287,7 @@ class Plugin {
 				'thumbnail_width'   => $atts['thumbnail-width'],
 				'thumbnail_height'  => $atts['thumbnail-height'],
 				'thumbnail_method'  => $atts['thumbnail-method'],
-			)
+			]
 		);
 
 		return $html;
