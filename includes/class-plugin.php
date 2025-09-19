@@ -214,18 +214,18 @@ class Plugin {
 			$atts['desc'] = __( 'Please login to upload files.', 'wp-dropzone' );
 		}
 
-		$html = '<form action="" class="dropzone dropzone-' . $atts['id'] . '" id="wp-dz-' . $atts['id'] . '">';
+		$html = '<form action="" class="dropzone dropzone-' . esc_attr( $atts['id'] ) . '" id="wp-dz-' . esc_attr( $atts['id'] ) . '">';
 		if ( $atts['title'] || $atts['desc'] ) {
 			$html .= '<div class="dz-message">
-				<h3 class="dropzone-title">' . $atts['title'] . '</h3>
-				<p class="dropzone-note">' . $atts['desc'] . '</p>
+				<h3 class="dropzone-title">' . esc_html( $atts['title'] ) . '</h3>
+				<p class="dropzone-note">' . esc_html( $atts['desc'] ) . '</p>
 				<div class="dropzone-mobile-trigger needsclick"></div>
 			</div>';
 		}
 		$html .= '</form>';
 
 		if ( 'false' === $atts['auto-process'] ) {
-			$html .= '<button class="process-upload" id="process-' . $atts['id'] . '">' . $atts['upload-button-text'] . '</button>';
+			$html .= '<button class="process-upload" id="process-' . esc_attr( $atts['id'] ) . '">' . esc_html( $atts['upload-button-text'] ) . '</button>';
 		}
 
 		// inline css.
