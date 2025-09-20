@@ -1,12 +1,12 @@
 === WP Dropzone ===
 Contributors: nazsabuz
 Tags: dropzone, wpdropzone, wp dropzone, media, media upload, file, file upload, image, image upload, drag drop
-Requires at least: 5.0
+Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.0
 Stable tag: 1.1.0
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: <https://www.gnu.org/licenses/gpl-2.0.html>
 
 Upload files into WordPress media library from front-end with drag-and-drop functionality and customizable options.
 
@@ -35,8 +35,9 @@ Use the `[wp-dropzone]` shortcode in your posts, pages, or templates:
 ```
 
 Or in PHP templates:
+
 ```
-<?php echo do_shortcode('[wp-dropzone]'); ?>
+<?php echo do_shortcode( '[wp-dropzone]' ); ?>
 ```
 
 ### Shortcode Attributes
@@ -52,6 +53,7 @@ Or in PHP templates:
 | `auto-process` | Auto-upload files when dropped | true | `[wp-dropzone auto-process="false"]` |
 | `clickable` | Make dropzone clickable | true | `[wp-dropzone clickable="false"]` |
 | `remove-links` | Show remove file buttons | false | `[wp-dropzone remove-links="true"]` |
+| `upload-button-text` | Text for manual upload button | "Upload Files" | `[wp-dropzone upload-button-text="Upload Selected Files"]` |
 | `resize-width` | Resize images to specified width | Original | `[wp-dropzone resize-width="800"]` |
 | `resize-height` | Resize images to specified height | Original | `[wp-dropzone resize-height="600"]` |
 | `resize-quality` | Image quality (0.1-1.0) | 0.8 | `[wp-dropzone resize-quality="0.9"]` |
@@ -104,11 +106,13 @@ dropzone.on("success", function(file, response) {
 ### Examples
 
 #### Basic Image Upload
+
 ```
 [wp-dropzone accepted-files="image/*" max-files="5" title="Upload Images"]
 ```
 
 #### Document Upload with Restrictions
+
 ```
 [wp-dropzone 
     accepted-files=".pdf,.doc,.docx" 
@@ -119,6 +123,7 @@ dropzone.on("success", function(file, response) {
 ```
 
 #### Styled Upload Area
+
 ```
 [wp-dropzone 
     title="Drop Files Here" 
@@ -130,6 +135,7 @@ dropzone.on("success", function(file, response) {
 ```
 
 #### Manual Upload Button
+
 ```
 [wp-dropzone 
     auto-process="false" 
@@ -146,7 +152,7 @@ dropzone.on("success", function(file, response) {
 
 ### Requirements
 
-* WordPress 5.0 or higher
+* WordPress 6.0 or higher
 * PHP 7.0 or higher
 * Modern web browser with JavaScript enabled
 
@@ -179,6 +185,8 @@ Yes, you can use the `dom-id` attribute to copy uploaded file URLs to form field
 == Changelog ==
 
 = 1.1.0 =
+
+* Added: FSE theme support
 * Added: Improved error handling and user feedback
 * Added: Enhanced security with nonce verification
 * Added: Translation support and POT file
@@ -188,39 +196,47 @@ Yes, you can use the `dom-id` attribute to copy uploaded file URLs to form field
 * Fixed: Minor bugs and typos
 
 = 1.0.7 =
+
 * Added: Action hooks for before/after upload events
 
 = 1.0.6 =
+
 * Security Fix: Removed guest upload feature
 * Updated: Dropzone library to latest version
 * Warning: Plugin reactivation required after upgrade
 
 = 1.0.5 =
+
 * Added: WordPress 4.9.x compatibility
 * Improved: Code structure and organization
 
 = 1.0.4 =
+
 * Improved: Overall code structure
 
 = 1.0.3 =
+
 * Added: Thumbnail resize functionality
 
 = 1.0.2 =
+
 * Added: Custom ID support
 * Added: Native Dropzone events support
 * Improved: Asset loading and performance
 
 = 1.0.1 =
+
 * Added: Image resize and crop options
 * Added: Image quality control
 
 = 1.0.0 =
+
 * Initial release with basic functionality
 
 == Upgrade Notice ==
 
 = 1.1.0 =
-Major update with improved security and translation support. No breaking changes.
+Major update with FSE theme support, improved security, and translation support.
 
 = 1.0.6 =
 Security update: Guest uploads removed. Please reactivate the plugin after upgrading.
