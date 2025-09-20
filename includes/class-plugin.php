@@ -118,6 +118,10 @@ class Plugin {
 				require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 			}
 
+			if ( ! defined( 'FS_CHMOD_FILE' ) ) {
+				define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
+			}
+
 			$wp_filesystem = new WP_Filesystem_Direct( null );
 
 			// Combine file chunks.
@@ -130,7 +134,7 @@ class Plugin {
 				return;
 			}
 
-			$file['tmp_name'] = tempnam( $tmp_file );
+			$file['tmp_name'] = tempnam( $tmp_file, '' );
 			$file['type']     = isset( $_POST['origtype'] ) ? sanitize_text_field( wp_unslash( $_POST['origtype'] ) ) : '';
 			$file['size']     = $wp_filesystem->size( $tmp_file );
 		}
