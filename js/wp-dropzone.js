@@ -1,11 +1,12 @@
-// Get all dropzone forms and initialize each one
+// Initialize dropzone instances after DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
 	var dropzoneForms = document.querySelectorAll('.dropzone[data-config]');
 
 	dropzoneForms.forEach(function (form) {
 		var configData = JSON.parse(form.getAttribute('data-config'));
 
-		Dropzone.options['wpDz' + configData.instance_id] = {
+		// Initialize Dropzone manually on the form element
+		var dropzone = new Dropzone('#'+form.id, {
 			url: configData.ajax_url + '?action=wp_dropzone_upload_media',
 			paramName: 'file',
 			maxFilesize: configData.max_file_size,
@@ -70,6 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
 					}
 				}
 			},
-		};
+		});
 	});
 });
