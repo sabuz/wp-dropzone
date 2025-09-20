@@ -37,7 +37,7 @@ Use the `[wp-dropzone]` shortcode in your posts, pages, or templates:
 Or in PHP templates:
 
 ```
-<?php echo do_shortcode('[wp-dropzone]'); ?>
+<?php echo do_shortcode( '[wp-dropzone]' ); ?>
 ```
 
 ### Shortcode Attributes

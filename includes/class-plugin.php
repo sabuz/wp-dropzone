@@ -80,9 +80,8 @@ class Plugin {
 	/**
 	 * Handle AJAX file upload to WordPress media library
 	 *
-	 * Processes file uploads including chunked uploads for large files.
-	 * Includes security verification, nonce validation, and media library integration.
-	 * Supports both regular and chunked uploads for better performance.
+	 * Processes file uploads with security verification, nonce validation, and media library integration.
+	 * Includes performance optimizations for better upload handling.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -312,7 +311,7 @@ class Plugin {
 	/**
 	 * Minify CSS for inline styles
 	 *
-	 * Removes comments, unnecessary whitespace, and optimizes CSS
+	 * Removes unnecessary whitespace, and optimizes CSS
 	 * for better performance when outputting inline styles.
 	 *
 	 * @since 1.1.0

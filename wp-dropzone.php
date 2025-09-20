@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       WP Dropzone
  * Plugin URI:        https://wordpress.org/plugins/wp-dropzone/
- * Description:       Upload files into WordPress media library from front-end with drag-and-drop functionality, chunked uploads, and customizable options.
+ * Description:       Upload files into WordPress media library from front-end with drag-and-drop functionality and customizable options.
  * Version:           1.1.0
  * Author:            Nazmul Sabuz
  * Author URI:        https://profiles.wordpress.org/nazsabuz/
