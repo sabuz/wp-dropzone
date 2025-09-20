@@ -6,7 +6,7 @@ Tested up to: 6.8
 Requires PHP: 7.0
 Stable tag: 1.1.0
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: <https://www.gnu.org/licenses/gpl-2.0.html>
 
 Upload files into WordPress media library from front-end with drag-and-drop functionality and customizable options.
 
@@ -35,6 +35,7 @@ Use the `[wp-dropzone]` shortcode in your posts, pages, or templates:
 ```
 
 Or in PHP templates:
+
 ```
 <?php echo do_shortcode('[wp-dropzone]'); ?>
 ```
@@ -104,11 +105,13 @@ dropzone.on("success", function(file, response) {
 ### Examples
 
 #### Basic Image Upload
+
 ```
 [wp-dropzone accepted-files="image/*" max-files="5" title="Upload Images"]
 ```
 
 #### Document Upload with Restrictions
+
 ```
 [wp-dropzone 
     accepted-files=".pdf,.doc,.docx" 
@@ -119,6 +122,7 @@ dropzone.on("success", function(file, response) {
 ```
 
 #### Styled Upload Area
+
 ```
 [wp-dropzone 
     title="Drop Files Here" 
@@ -130,6 +134,7 @@ dropzone.on("success", function(file, response) {
 ```
 
 #### Manual Upload Button
+
 ```
 [wp-dropzone 
     auto-process="false" 
@@ -179,6 +184,7 @@ Yes, you can use the `dom-id` attribute to copy uploaded file URLs to form field
 == Changelog ==
 
 = 1.1.0 =
+
 * Added: Improved error handling and user feedback
 * Added: Enhanced security with nonce verification
 * Added: Translation support and POT file
@@ -188,33 +194,41 @@ Yes, you can use the `dom-id` attribute to copy uploaded file URLs to form field
 * Fixed: Minor bugs and typos
 
 = 1.0.7 =
+
 * Added: Action hooks for before/after upload events
 
 = 1.0.6 =
+
 * Security Fix: Removed guest upload feature
 * Updated: Dropzone library to latest version
 * Warning: Plugin reactivation required after upgrade
 
 = 1.0.5 =
+
 * Added: WordPress 4.9.x compatibility
 * Improved: Code structure and organization
 
 = 1.0.4 =
+
 * Improved: Overall code structure
 
 = 1.0.3 =
+
 * Added: Thumbnail resize functionality
 
 = 1.0.2 =
+
 * Added: Custom ID support
 * Added: Native Dropzone events support
 * Improved: Asset loading and performance
 
 = 1.0.1 =
+
 * Added: Image resize and crop options
 * Added: Image quality control
 
 = 1.0.0 =
+
 * Initial release with basic functionality
 
 == Upgrade Notice ==

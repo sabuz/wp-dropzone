@@ -21,6 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
+add_filter('upload_size_limit', function($size){
+    return 2 * 1024 * 1024; // 512MB
+});
+
+
 // Define plugin constants.
 define( 'WP_DROPZONE_VERSION', '1.1.0' );
 define( 'WP_DROPZONE_BASENAME', plugin_basename( __FILE__ ) );

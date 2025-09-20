@@ -30,7 +30,10 @@ class Plugin {
 	/**
 	 * Initialize plugin hooks and actions
 	 *
-	 * @since 1.1.0
+	 * Sets up WordPress hooks for script enqueuing, AJAX handling,
+	 * and shortcode registration.
+	 *
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function __construct() {
@@ -62,7 +65,9 @@ class Plugin {
 	/**
 	 * Load plugin text domain for translations
 	 *
-	 * @since 1.1.0
+	 * Loads the plugin's translation files for internationalization.
+	 *
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function load_textdomain() {
@@ -71,6 +76,9 @@ class Plugin {
 
 	/**
 	 * Enqueue scripts and styles for pages with shortcode
+	 *
+	 * Conditionally loads Dropzone CSS and JavaScript files only on pages
+	 * that contain the wp-dropzone shortcode for optimal performance.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -89,7 +97,8 @@ class Plugin {
 	 * Handle AJAX file upload to WordPress media library
 	 *
 	 * Processes file uploads including chunked uploads for large files.
-	 * Includes security verification and media library integration.
+	 * Includes security verification, nonce validation, and media library integration.
+	 * Supports both regular and chunked uploads for better performance.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -132,7 +141,7 @@ class Plugin {
 			}
 
 			$file['tmp_name'] = tempnam( $tmp_file );
-			$file['type']     = $_POST['origtype'];
+			$file['type']     = isset( $_POST['origtype'] ) ? sanitize_text_field( wp_unslash( $_POST['origtype'] ) ) : '';
 			$file['size']     = $wp_filesystem->size( $tmp_file );
 		}
 
@@ -190,9 +199,13 @@ class Plugin {
 	/**
 	 * Render wp-dropzone shortcode with customizable options
 	 *
+	 * Generates HTML for dropzone upload areas with configurable styling,
+	 * file restrictions, and upload behavior. Configuration is passed via
+	 * data-config attribute for JavaScript initialization.
+	 *
 	 * @since 1.0.0
-	 * @param array $atts Shortcode attributes.
-	 * @return string HTML output for dropzone form
+	 * @param array $atts Shortcode attributes with default values.
+	 * @return string HTML output for dropzone with inline styles
 	 */
 	public function add_shortcode( $atts ) {
 		$atts = shortcode_atts(
@@ -211,9 +224,9 @@ class Plugin {
 				'clickable'          => 'true',
 				'accepted-files'     => null,
 				'max-files'          => null,
-				'max-files-alert'    => __( 'Max file limit excedeed.', 'wp-dropzone' ),
+				'max-files-alert'    => __( 'Max file limit exceeded.', 'wp-dropzone' ),
 				'auto-process'       => 'true',
-				'upload-button-text' => __( 'Uplaod', 'wp-dropzone' ),
+				'upload-button-text' => __( 'Upload', 'wp-dropzone' ),
 				'dom-id'             => '',
 				'resize-width'       => null,
 				'resize-height'      => null,
@@ -235,7 +248,6 @@ class Plugin {
 			'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
 			'is_user_logged_in' => is_user_logged_in(),
 			'id'                => $atts['id'],
-			'instance_id'       => ucfirst( $atts['id'] ),
 			'callback'          => $atts['callback'],
 			'title'             => $atts['title'],
 			'desc'              => $atts['desc'],
@@ -256,7 +268,7 @@ class Plugin {
 			'thumbnail_method'  => $atts['thumbnail-method'],
 		];
 
-		$html = '<form action="" class="dropzone dropzone-' . esc_attr( $atts['id'] ) . '" id="wp-dz-' . esc_attr( $atts['id'] ) . '" data-config="' . esc_attr( wp_json_encode( $configs ) ) . '">';
+		$html = '<div class="dropzone dropzone-' . esc_attr( $atts['id'] ) . '" id="wp-dz-' . esc_attr( $atts['id'] ) . '" data-config="' . esc_attr( wp_json_encode( $configs ) ) . '">';
 		if ( $atts['title'] || $atts['desc'] ) {
 			$html .= '<div class="dz-message">
 				<h3 class="dropzone-title">' . esc_html( $atts['title'] ) . '</h3>
@@ -264,11 +276,7 @@ class Plugin {
 				<div class="dropzone-mobile-trigger needsclick"></div>
 			</div>';
 		}
-		$html .= '</form>';
-
-		if ( 'false' === $atts['auto-process'] ) {
-			$html .= '<button class="process-upload" id="process-' . esc_attr( $atts['id'] ) . '">' . esc_html( $atts['upload-button-text'] ) . '</button>';
-		}
+		$html .= '</div>';
 
 		// Generate inline CSS for styling.
 		$css = '.dropzone-' . $atts['id'] . ' {';
@@ -298,40 +306,35 @@ class Plugin {
 			}';
 		}
 
-		// Add inline styles.
-		wp_add_inline_style( 'dropzone', $css );
+		$html .= '<style>' . $this->minify_css( $css ) . '</style>';
 
-		// Localize script data.
-		wp_localize_script(
-			'wp-dropzone',
-			'wpDzI18n',
-			[
-				'ajax_url'          => esc_url( admin_url( 'admin-ajax.php' ) ),
-				'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
-				'is_user_logged_in' => is_user_logged_in(),
-				'id'                => $atts['id'],
-				'instance_id'       => ucfirst( $atts['id'] ),
-				'callback'          => $atts['callback'],
-				'title'             => $atts['title'],
-				'desc'              => $atts['desc'],
-				'max_file_size'     => $atts['max-file-size'],
-				'remove_links'      => $atts['remove-links'],
-				'clickable'         => $atts['clickable'],
-				'accepted_files'    => $atts['accepted-files'],
-				'max_files'         => $atts['max-files'],
-				'max_files_alert'   => $atts['max-files-alert'],
-				'auto_process'      => $atts['auto-process'],
-				'dom_id'            => $atts['dom-id'],
-				'resize_width'      => $atts['resize-width'],
-				'resize_height'     => $atts['resize-height'],
-				'resize_quality'    => $atts['resize-quality'],
-				'resize_method'     => $atts['resize-method'],
-				'thumbnail_width'   => $atts['thumbnail-width'],
-				'thumbnail_height'  => $atts['thumbnail-height'],
-				'thumbnail_method'  => $atts['thumbnail-method'],
-			]
-		);
+		if ( 'false' === $atts['auto-process'] ) {
+			$html .= '<button type="button" class="process-upload" id="process-' . esc_attr( $atts['id'] ) . '">' . esc_html( $atts['upload-button-text'] ) . '</button>';
+		}
 
 		return $html;
+	}
+
+	/**
+	 * Minify CSS for inline styles
+	 *
+	 * Removes comments, unnecessary whitespace, and optimizes CSS
+	 * for better performance when outputting inline styles.
+	 *
+	 * @since 1.1.0
+	 * @param string $css Raw CSS to minify.
+	 * @return string Minified CSS.
+	 */
+	protected function minify_css( $css ) {
+		// Remove whitespace around symbols.
+		$css = preg_replace( '/\s*([{}|:;,])\s*/', '$1', $css );
+
+		// Remove trailing semicolons inside blocks.
+		$css = preg_replace( '/;}/', '}', $css );
+
+		// Remove extra whitespace, newlines, tabs.
+		$css = preg_replace( '/\s\s+/', ' ', $css );
+
+		return trim( $css );
 	}
 }
