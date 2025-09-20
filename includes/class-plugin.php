@@ -230,7 +230,33 @@ class Plugin {
 			$atts['desc'] = __( 'Please login to upload files.', 'wp-dropzone' );
 		}
 
-		$html = '<form action="" class="dropzone dropzone-' . esc_attr( $atts['id'] ) . '" id="wp-dz-' . esc_attr( $atts['id'] ) . '">';
+		$configs = [
+			'ajax_url'          => esc_url( admin_url( 'admin-ajax.php' ) ),
+			'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
+			'is_user_logged_in' => is_user_logged_in(),
+			'id'                => $atts['id'],
+			'instance_id'       => ucfirst( $atts['id'] ),
+			'callback'          => $atts['callback'],
+			'title'             => $atts['title'],
+			'desc'              => $atts['desc'],
+			'max_file_size'     => $atts['max-file-size'],
+			'remove_links'      => $atts['remove-links'],
+			'clickable'         => $atts['clickable'],
+			'accepted_files'    => $atts['accepted-files'],
+			'max_files'         => $atts['max-files'],
+			'max_files_alert'   => $atts['max-files-alert'],
+			'auto_process'      => $atts['auto-process'],
+			'dom_id'            => $atts['dom-id'],
+			'resize_width'      => $atts['resize-width'],
+			'resize_height'     => $atts['resize-height'],
+			'resize_quality'    => $atts['resize-quality'],
+			'resize_method'     => $atts['resize-method'],
+			'thumbnail_width'   => $atts['thumbnail-width'],
+			'thumbnail_height'  => $atts['thumbnail-height'],
+			'thumbnail_method'  => $atts['thumbnail-method'],
+		];
+
+		$html = '<form action="" class="dropzone dropzone-' . esc_attr( $atts['id'] ) . '" id="wp-dz-' . esc_attr( $atts['id'] ) . '" data-config="' . esc_attr( wp_json_encode( $configs ) ) . '">';
 		if ( $atts['title'] || $atts['desc'] ) {
 			$html .= '<div class="dz-message">
 				<h3 class="dropzone-title">' . esc_html( $atts['title'] ) . '</h3>

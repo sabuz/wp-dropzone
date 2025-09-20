@@ -1,66 +1,75 @@
-Dropzone.options['wpDz' + wpDzI18n.instance_id] = {
-	url: wpDzI18n.ajax_url + '?action=wp_dropzone_upload_media',
-	paramName: 'file',
-	maxFilesize: wpDzI18n.max_file_size,
-	addRemoveLinks: wpDzI18n.remove_links,
-	clickable: wpDzI18n.clickable === 'true',
-	acceptedFiles: wpDzI18n.accepted_files,
-	autoProcessQueue: wpDzI18n.auto_process === 'true',
-	maxFiles: wpDzI18n.max_files,
-	resizeWidth: wpDzI18n.resize_width,
-	resizeHeight: wpDzI18n.resize_height,
-	resizeQuality: wpDzI18n.resize_quality,
-	resizeMethod: wpDzI18n.resize_method,
-	thumbnailWidth: wpDzI18n.thumbnail_width,
-	thumbnailHeight: wpDzI18n.thumbnail_height,
-	thumbnailMethod: wpDzI18n.thumbnail_method,
-	init: function () {
-		var closure = this;
+// Get all dropzone forms and initialize each one
+document.addEventListener('DOMContentLoaded', function () {
+	var dropzoneForms = document.querySelectorAll('.dropzone[data-config]');
 
-		// auto process false
-		if (wpDzI18n.auto_process === 'false') {
-			document
-				.getElementById('process-' + wpDzI18n.id)
-				.addEventListener('click', function () {
-					closure.processQueue();
-				});
-		}
+	dropzoneForms.forEach(function (form) {
+		var configData = JSON.parse(form.getAttribute('data-config'));
 
-		// disable if user not logged in
-		if (Boolean(wpDzI18n.is_user_logged_in) !== true) {
-			this.disable();
-		}
+		Dropzone.options['wpDz' + configData.instance_id] = {
+			url: configData.ajax_url + '?action=wp_dropzone_upload_media',
+			paramName: 'file',
+			maxFilesize: configData.max_file_size,
+			addRemoveLinks: configData.remove_links,
+			clickable: configData.clickable === 'true',
+			acceptedFiles: configData.accepted_files,
+			autoProcessQueue: configData.auto_process === 'true',
+			maxFiles: configData.max_files,
+			resizeWidth: configData.resize_width,
+			resizeHeight: configData.resize_height,
+			resizeQuality: configData.resize_quality,
+			resizeMethod: configData.resize_method,
+			thumbnailWidth: configData.thumbnail_width,
+			thumbnailHeight: configData.thumbnail_height,
+			thumbnailMethod: configData.thumbnail_method,
+			init: function () {
+				var closure = this;
 
-		// callback
-		var callbacks = wpDzI18n.callback.replace(/(})\s?,/, '},##').split(',##');
-
-		if (callbacks.length > 0) {
-			callbacks.forEach(function (callback) {
-				callback = callback.trim().split(/\s?:\s?/);
-
-				if (callback.length === 2) {
-					eval('var func = ' + callback[1]);
-					closure.on(callback[0], func);
+				// auto process false
+				if (configData.auto_process === 'false') {
+					document
+						.getElementById('process-' + configData.id)
+						.addEventListener('click', function () {
+							closure.processQueue();
+						});
 				}
-			});
-		}
-	},
-	sending: function (file, xhr, data) {
-		data.append('nonce', wpDzI18n.nonce);
-		data.append('origtype', file.type);
-	},
-	maxfilesexceeded: function (file) {
-		this.removeFile(file);
 
-		if (wpDzI18n.max_files_alert) {
-			alert(wpDzI18n.max_files_alert);
-		}
-	},
-	success: function (file, response) {
-		if (wpDzI18n.dom_id.length > 0) {
-			if (response.error == 'false') {
-				document.getElementById(wpDzI18n.dom_id).value = response.data;
-			}
-		}
-	},
-};
+				// disable if user not logged in
+				if (Boolean(configData.is_user_logged_in) !== true) {
+					this.disable();
+				}
+
+				// callback
+				var callbacks = configData.callback.replace(/(})\s?,/, '},##').split(',##');
+
+				if (callbacks.length > 0) {
+					callbacks.forEach(function (callback) {
+						callback = callback.trim().split(/\s?:\s?/);
+
+						if (callback.length === 2) {
+							eval('var func = ' + callback[1]);
+							closure.on(callback[0], func);
+						}
+					});
+				}
+			},
+			sending: function (file, xhr, data) {
+				data.append('nonce', configData.nonce);
+				data.append('origtype', file.type);
+			},
+			maxfilesexceeded: function (file) {
+				this.removeFile(file);
+
+				if (configData.max_files_alert) {
+					alert(configData.max_files_alert);
+				}
+			},
+			success: function (file, response) {
+				if (configData.dom_id.length > 0) {
+					if (response.error == 'false') {
+						document.getElementById(configData.dom_id).value = response.data;
+					}
+				}
+			},
+		};
+	});
+});
