@@ -28,7 +28,7 @@ WP Dropzone integrates the powerful Dropzone.js library with WordPress, allowing
 
 ### Shortcode Usage
 
-Use the `[wp-dropzone]` shortcode in your posts, pages, or templates:
+Insert the dropzone anywhere in your posts, pages, or templates with the shortcode:
 
 `
 [wp-dropzone]
@@ -300,16 +300,3 @@ Major update with FSE theme support, improved security, and translation support.
 
 = 1.0.6 =
 Security update: Guest uploads removed. Please reactivate the plugin after upgrading.
-
-== Support ==
-
-For support, feature requests, or bug reports, please visit the [WordPress.org support forum](https://wordpress.org/support/plugin/wp-dropzone/).
-
-== Contributing ==
-
-Contributions are welcome! Please submit pull requests or report issues on the plugin's GitHub repository.
-
-== Credits ==
-
-* Built with [Dropzone.js](https://www.dropzonejs.com/)
-* WordPress integration and customization by Nazmul Sabuz
