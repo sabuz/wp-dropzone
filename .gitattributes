@@ -1,0 +1,29 @@
+# Development files - exclude from distribution
+package.json export-ignore
+package-lock.json export-ignore
+composer.json export-ignore
+composer.lock export-ignore
+
+# Dependencies - exclude from distribution
+node_modules export-ignore
+vendor export-ignore
+
+# Configuration files - exclude from distribution
+.editorconfig export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.prettierrc export-ignore
+phpcs.xml export-ignore
+
+# System files - exclude from distribution
+.DS_Store export-ignore
+Thumbs.db export-ignore
+
+# IDE files - exclude from distribution
+.vscode export-ignore
+.idea export-ignore
+*.sublime-* export-ignore
+
+# Build artifacts - exclude from distribution
+*.log export-ignore
+*.map export-ignore

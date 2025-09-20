@@ -1,0 +1,40 @@
+{
+	"name": "wp-dropzone",
+	"version": "1.1.0",
+	"description": "Upload files into WordPress media library from front-end with drag-and-drop functionality and customizable options.",
+	"author": "Nazmul Sabuz",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"dropzone",
+		"wpdropzone",
+		"wp dropzone",
+		"media",
+		"media upload",
+		"file",
+		"file upload",
+		"image",
+		"image upload",
+		"drag drop",
+		"upload",
+		"dropzone.js"
+	],
+	"homepage": "https://wordpress.org/plugins/wp-dropzone/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sabuz/wp-dropzone"
+	},
+	"bugs": {
+		"url": "https://github.com/sabuz/wp-dropzone/issues"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^30.22.0"
+	},
+	"scripts": {
+		"format": "wp-scripts format ./js/wp-dropzone.js",
+		"lint:js": "wp-scripts lint-js ./js/wp-dropzone.js",
+		"lint:js:fix": "wp-scripts lint-js ./js/wp-dropzone.js --fix",
+		"lint:md:docs": "wp-scripts lint-md-docs",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"plugin-zip": "git archive --format=zip HEAD -o wp-dropzone.zip"
+	}
+}

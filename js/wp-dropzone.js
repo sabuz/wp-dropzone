@@ -19,9 +19,11 @@ Dropzone.options['wpDz' + wpDzI18n.instance_id] = {
 
 		// auto process false
 		if (wpDzI18n.auto_process === 'false') {
-			document.getElementById('process-' + wpDzI18n.id).addEventListener('click', function () {
-				closure.processQueue();
-			});
+			document
+				.getElementById('process-' + wpDzI18n.id)
+				.addEventListener('click', function () {
+					closure.processQueue();
+				});
 		}
 
 		// disable if user not logged in
