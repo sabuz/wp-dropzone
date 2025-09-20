@@ -1,7 +1,7 @@
 === WP Dropzone ===
 Contributors: nazsabuz
 Tags: dropzone, wpdropzone, wp dropzone, media, media upload, file, file upload, image, image upload, drag drop
-Requires at least: 5.0
+Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.0
 Stable tag: 1.1.0
@@ -53,6 +53,7 @@ Or in PHP templates:
 | `auto-process` | Auto-upload files when dropped | true | `[wp-dropzone auto-process="false"]` |
 | `clickable` | Make dropzone clickable | true | `[wp-dropzone clickable="false"]` |
 | `remove-links` | Show remove file buttons | false | `[wp-dropzone remove-links="true"]` |
+| `upload-button-text` | Text for manual upload button | "Upload Files" | `[wp-dropzone upload-button-text="Upload Selected Files"]` |
 | `resize-width` | Resize images to specified width | Original | `[wp-dropzone resize-width="800"]` |
 | `resize-height` | Resize images to specified height | Original | `[wp-dropzone resize-height="600"]` |
 | `resize-quality` | Image quality (0.1-1.0) | 0.8 | `[wp-dropzone resize-quality="0.9"]` |
@@ -151,7 +152,7 @@ dropzone.on("success", function(file, response) {
 
 ### Requirements
 
-* WordPress 5.0 or higher
+* WordPress 6.0 or higher
 * PHP 7.0 or higher
 * Modern web browser with JavaScript enabled
 
@@ -185,6 +186,7 @@ Yes, you can use the `dom-id` attribute to copy uploaded file URLs to form field
 
 = 1.1.0 =
 
+* Added: FSE theme support
 * Added: Improved error handling and user feedback
 * Added: Enhanced security with nonce verification
 * Added: Translation support and POT file
@@ -234,7 +236,7 @@ Yes, you can use the `dom-id` attribute to copy uploaded file URLs to form field
 == Upgrade Notice ==
 
 = 1.1.0 =
-Major update with improved security and translation support. No breaking changes.
+Major update with FSE theme support, improved security, and translation support.
 
 = 1.0.6 =
 Security update: Guest uploads removed. Please reactivate the plugin after upgrading.
