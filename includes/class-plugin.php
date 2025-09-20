@@ -219,7 +219,7 @@ class Plugin {
 				'border-color'       => '',
 				'background'         => '',
 				'margin-bottom'      => '',
-				'max-file-size'      => (int) ini_get( 'upload_max_filesize' ) * 1000000,
+				'max-file-size'      => wp_max_upload_size(),
 				'remove-links'       => 'false',
 				'clickable'          => 'true',
 				'accepted-files'     => null,
