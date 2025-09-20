@@ -37,9 +37,6 @@ class Plugin {
 	 * @return void
 	 */
 	public function __construct() {
-		// Load dependencies.
-		$this->load_dependencies();
-
 		// Load text domain for translations.
 		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
 
@@ -47,19 +44,6 @@ class Plugin {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'wp_ajax_wp_dropzone_upload_media', [ $this, 'ajax_upload_handle' ] );
 		add_shortcode( 'wp-dropzone', [ $this, 'add_shortcode' ] );
-	}
-
-	/**
-	 * Load required WordPress filesystem classes
-	 *
-	 * @since 1.0.0
-	 * @return void
-	 */
-	public function load_dependencies() {
-		if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
-			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
-		}
 	}
 
 	/**
@@ -124,10 +108,16 @@ class Plugin {
 
 		// Handle chunked uploads.
 		if ( isset( $_POST['dzuuid'] ) && isset( $_POST['dzchunkindex'] ) && isset( $_POST['dztotalchunkcount'] ) ) {
-			$uid           = trim( sanitize_text_field( wp_unslash( $_POST['dzuuid'] ) ) );
-			$total_chunks  = intval( $_POST['dztotalchunkcount'] );
-			$chunk_index   = intval( $_POST['dzchunkindex'] ) + 1;
-			$uploads       = wp_upload_dir();
+			$uid          = trim( sanitize_text_field( wp_unslash( $_POST['dzuuid'] ) ) );
+			$total_chunks = intval( $_POST['dztotalchunkcount'] );
+			$chunk_index  = intval( $_POST['dzchunkindex'] ) + 1;
+			$uploads      = wp_upload_dir();
+
+			if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+				require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+			}
+
 			$wp_filesystem = new WP_Filesystem_Direct( null );
 
 			// Combine file chunks.
