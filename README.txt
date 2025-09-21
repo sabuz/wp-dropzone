@@ -1,6 +1,6 @@
 === WP Dropzone ===
 Contributors: nazsabuz
-Tags: dropzone, wpdropzone, wp dropzone, media, media upload, file, file upload, image, image upload, drag drop
+Tags: dropzone, file upload, image upload, media upload, media
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.0
