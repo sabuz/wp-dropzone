@@ -78,5 +78,12 @@
 		"html": false
 	},
 	"textdomain": "wp-dropzone",
-	"editorScript": "file:./index.js"
+	"editorScript": "file:./index.js",
+	"style": [
+		"file:../../css/dropzone.css"
+	],
+	"viewScript": [
+		"file:../../js/dropzone.min.js",
+		"file:../../js/wp-dropzone.js"
+	]
 }

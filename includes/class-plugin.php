@@ -43,6 +43,8 @@ class Plugin {
 		// Initialize plugin actions.
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'wp_ajax_wp_dropzone_upload_media', [ $this, 'ajax_upload_handle' ] );
+		add_action( 'wp_ajax_wp_dropzone_get_nonce', [ $this, 'ajax_get_nonce' ] );
+		add_action( 'wp_ajax_nopriv_wp_dropzone_get_nonce', [ $this, 'ajax_get_nonce' ] );
 		add_shortcode( 'wp-dropzone', [ $this, 'add_shortcode' ] );
 	}
 
@@ -187,6 +189,25 @@ class Plugin {
 		}
 
 		wp_send_json( $message );
+	}
+
+	/**
+	 * Provide nonce and AJAX URL for block front-end initialization
+	 *
+	 * Exposes a public endpoint to fetch a fresh nonce and contextual data
+	 * needed by the front-end when the block renders static markup.
+	 *
+	 * @since 1.1.0
+	 * @return void
+	 */
+	public function ajax_get_nonce() {
+		wp_send_json_success(
+			[
+				'nonce'               => wp_create_nonce( 'wp_dropzone_nonce' ),
+				'ajax_url'            => esc_url( admin_url( 'admin-ajax.php' ) ),
+				'is_user_logged_in'   => is_user_logged_in(),
+			]
+		);
 	}
 
 	/**
