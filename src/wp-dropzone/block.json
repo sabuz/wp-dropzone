@@ -1,0 +1,82 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "create-block/wp-dropzone",
+	"version": "0.1.0",
+	"title": "Wp Dropzone",
+	"category": "widgets",
+	"icon": "smiley",
+	"description": "Example block scaffolded with Create Block tool.",
+	"example": {},
+	"attributes": {
+		"id": {
+		  "type": "string",
+		  "default": ""
+		},
+		"title": {
+		  "type": "string",
+		  "default": ""
+		},
+		"desc": {
+		  "type": "string",
+		  "default": ""
+		},
+		"acceptedFiles": {
+		  "type": "string",
+		  "default": ""
+		},
+		"maxFiles": {
+		  "type": "number",
+		  "default": ""
+		},
+		"autoProcess": {
+		  "type": "boolean",
+		  "default": true
+		},
+		"clickable": {
+		  "type": "boolean",
+		  "default": true
+		},
+		"removeLinks": {
+		  "type": "boolean",
+		  "default": false
+		},
+		"uploadButtonText": {
+		  "type": "string",
+		  "default": "Upload Files"
+		},
+		"resizeWidth": {
+		  "type": "number",
+		  "default": ""
+		},
+		"resizeHeight": {
+		  "type": "number",
+		  "default": ""
+		},
+		"resizeQuality": {
+		  "type": "number",
+		  "default": 0.1
+		},
+		"resizeMethod": {
+		  "type": "string",
+		  "default": "contain"
+		},
+		"thumbnailWidth": {
+		  "type": "number",
+		  "default": 120
+		},
+		"thumbnailHeight": {
+		  "type": "number",
+		  "default": 120
+		},
+		"thumbnailMethod": {
+		  "type": "string",
+		  "default": "crop"
+		}
+	  },
+	"supports": {
+		"html": false
+	},
+	"textdomain": "wp-dropzone",
+	"editorScript": "file:./index.js"
+}

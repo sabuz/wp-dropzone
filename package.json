@@ -30,10 +30,12 @@
 		"@wordpress/scripts": "^30.22.0"
 	},
 	"scripts": {
+		"build": "wp-scripts build --blocks-manifest",
 		"lint:js": "wp-scripts lint-js ./js/wp-dropzone.js",
 		"lint:js:fix": "wp-scripts lint-js ./js/wp-dropzone.js --fix",
 		"lint:md:docs": "wp-scripts lint-md-docs ./README.txt --fix",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
-		"plugin-zip": "git archive --format=zip HEAD -o wp-dropzone.zip"
+		"plugin-zip": "git archive --format=zip HEAD -o wp-dropzone.zip",
+		"start": "wp-scripts start --blocks-manifest"
 	}
 }
