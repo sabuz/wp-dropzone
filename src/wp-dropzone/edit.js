@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -58,24 +58,32 @@ export default function Edit({ attributes, setAttributes }) {
 			<InspectorControls>
 				<PanelBody title={__('Settings', 'wp-dropzone')} initialOpen={true}>
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Id', 'wp-dropzone')}
 						value={id || ''}
 						onChange={(value) => setAttributes({ id: value })}
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Title', 'wp-dropzone')}
 						value={title || ''}
 						onChange={(value) => setAttributes({ title: value })}
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Description', 'wp-dropzone')}
 						value={desc || ''}
 						onChange={(value) => setAttributes({ desc: value })}
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Accepted Files', 'wp-dropzone')}
 						help={__('Example: image/*, .pdf', 'wp-dropzone')}
 						value={acceptedFiles || ''}
@@ -83,6 +91,8 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Max Files', 'wp-dropzone')}
 						type="number"
 						value={maxFiles || ''}
@@ -90,30 +100,37 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={__('Auto Process', 'wp-dropzone')}
 						checked={!!autoProcess}
 						onChange={(value) => setAttributes({ autoProcess: value })}
 					/>
 
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={__('Clickable', 'wp-dropzone')}
 						checked={!!clickable}
 						onChange={(value) => setAttributes({ clickable: value })}
 					/>
 
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={__('Remove Links', 'wp-dropzone')}
 						checked={!!removeLinks}
 						onChange={(value) => setAttributes({ removeLinks: value })}
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Upload Button Text', 'wp-dropzone')}
 						value={uploadButtonText || ''}
 						onChange={(value) => setAttributes({ uploadButtonText: value })}
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Resize Width', 'wp-dropzone')}
 						type="number"
 						value={resizeWidth || ''}
@@ -121,6 +138,8 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Resize Height', 'wp-dropzone')}
 						type="number"
 						value={resizeHeight || ''}
@@ -128,6 +147,8 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Resize Quality', 'wp-dropzone')}
 						type="number"
 						help={__('Value between 0.1 and 1.0', 'wp-dropzone')}
@@ -138,13 +159,21 @@ export default function Edit({ attributes, setAttributes }) {
 						onChange={(value) => setAttributes({ resizeQuality: value })}
 					/>
 
-					<TextControl
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Resize Method', 'wp-dropzone')}
+						options={[
+							{ label: 'Contain', value: 'contain' },
+							{ label: 'Crop', value: 'crop' },
+						]}
 						value={resizeMethod || ''}
 						onChange={(value) => setAttributes({ resizeMethod: value })}
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Thumbnail Width', 'wp-dropzone')}
 						type="number"
 						value={thumbnailWidth || ''}
@@ -152,15 +181,23 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 
 					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Thumbnail Height', 'wp-dropzone')}
 						type="number"
 						value={thumbnailHeight || ''}
 						onChange={(value) => setAttributes({ thumbnailHeight: value })}
 					/>
 
-					<TextControl
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={__('Thumbnail Method', 'wp-dropzone')}
 						value={thumbnailMethod || ''}
+						options={[
+							{ label: 'Contain', value: 'contain' },
+							{ label: 'Crop', value: 'crop' },
+						]}
 						onChange={(value) => setAttributes({ thumbnailMethod: value })}
 					/>
 				</PanelBody>
