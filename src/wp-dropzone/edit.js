@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 
-import { PanelBody, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
+import { BaseControl, ColorPicker, PanelBody, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -51,6 +51,11 @@ export default function Edit({ attributes, setAttributes }) {
 		thumbnailWidth,
 		thumbnailHeight,
 		thumbnailMethod,
+		borderWidth,
+		borderStyle,
+		borderColor,
+		background,
+		marginBottom,
 	} = attributes;
 
 	return (
@@ -201,28 +206,83 @@ export default function Edit({ attributes, setAttributes }) {
 						onChange={(value) => setAttributes({ thumbnailMethod: value })}
 					/>
 				</PanelBody>
+				<PanelBody title={__('Styles', 'wp-dropzone')} initialOpen={false}>
+					{/* Border Width */}
+					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={__('Border Width', 'wp-dropzone')}
+						type='number'
+						value={borderWidth}
+						onChange={(value) => setAttributes({ borderWidth: value })}
+					/>
+
+					{/* Border Style */}
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={__('Border Style', 'wp-dropzone')}
+						value={borderStyle}
+						options={[
+							{ label: 'None', value: 'none' },
+							{ label: 'Solid', value: 'solid' },
+							{ label: 'Dashed', value: 'dashed' },
+							{ label: 'Dotted', value: 'dotted' },
+						]}
+						onChange={(value) => setAttributes({ borderStyle: value })}
+					/>
+
+					{/* Border Color */}
+					<BaseControl __nextHasNoMarginBottom label={__('Border Color', 'wp-dropzone')}>
+						<ColorPicker
+							color={borderColor}
+							onChange={(value) => setAttributes({ borderColor: value })}
+							enableAlpha
+						/>
+					</BaseControl>
+
+					{/* Background */}
+					<BaseControl __nextHasNoMarginBottom label={__('Background', 'wp-dropzone')}>
+						<ColorPicker
+							color={background}
+							onChange={(value) => setAttributes({ background: value })}
+							enableAlpha
+						/>
+					</BaseControl>
+
+					{/* Margin Bottom */}
+					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={__('Margin Bottom', 'wp-dropzone')}
+						type='number'
+						value={marginBottom}
+						onChange={(value) => setAttributes({ marginBottom: value })}
+					/>
+				</PanelBody>
 			</InspectorControls>
 
 			<div {...blockProps}>
-				<div
-					className={`dropzone dropzone-${ id || 'block' }`}
-					id={`wp-dz-${ id || 'block' }`}
-				>
-					{ ( title || desc ) ? (
+				<div className={`dropzone dropzone-${id || 'block'}`} id={`wp-dz-${id || 'block'}`}>
+					{title || desc ? (
 						<div className="dz-message">
-							<h3 className="dropzone-title">{ title }</h3>
-							<p className="dropzone-note">{ desc }</p>
+							<h3 className="dropzone-title">{title}</h3>
+							<p className="dropzone-note">{desc}</p>
 							<div className="dropzone-mobile-trigger needsclick"></div>
 						</div>
 					) : (
 						<div className="dz-default dz-message">Drop files here to upload</div>
-					) }
+					)}
 				</div>
-				{ autoProcess === false && (
-					<button type="button" className="process-upload" id={`process-${ id || 'block' }`}>
-						{ uploadButtonText || 'Upload' }
+				{autoProcess === false && (
+					<button
+						type="button"
+						className="process-upload"
+						id={`process-${id || 'block'}`}
+					>
+						{uploadButtonText || 'Upload'}
 					</button>
-				) }
+				)}
 			</div>
 		</>
 	);

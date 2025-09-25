@@ -72,6 +72,26 @@
 		"thumbnailMethod": {
 		  "type": "string",
 		  "default": "crop"
+		},
+		"borderWidth": {
+			"type": "number",
+			"default": ""
+		},
+		"borderStyle": {
+			"type": "string",
+			"default": ""
+		},
+		"borderColor": {
+			"type": "string",
+			"default": ""
+		},
+		"background": {
+			"type": "string",
+			"default": ""
+		},
+		"marginBottom": {
+			"type": "number",
+			"default": ""
 		}
 	  },
 	"supports": {
