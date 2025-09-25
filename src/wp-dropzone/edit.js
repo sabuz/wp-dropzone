@@ -202,7 +202,28 @@ export default function Edit({ attributes, setAttributes }) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div {...blockProps}>{'Wp Dropzone – hello from the editor!'}</div>
+
+			<div {...blockProps}>
+				<div
+					className={`dropzone dropzone-${ id || 'block' }`}
+					id={`wp-dz-${ id || 'block' }`}
+				>
+					{ ( title || desc ) ? (
+						<div className="dz-message">
+							<h3 className="dropzone-title">{ title }</h3>
+							<p className="dropzone-note">{ desc }</p>
+							<div className="dropzone-mobile-trigger needsclick"></div>
+						</div>
+					) : (
+						<div className="dz-default dz-message">Drop files here to upload</div>
+					) }
+				</div>
+				{ autoProcess === false && (
+					<button type="button" className="process-upload" id={`process-${ id || 'block' }`}>
+						{ uploadButtonText || 'Upload' }
+					</button>
+				) }
+			</div>
 		</>
 	);
 }
