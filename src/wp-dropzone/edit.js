@@ -11,9 +11,16 @@ import { __ } from '@wordpress/i18n';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
+import { useEffect, useState } from '@wordpress/element';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-
-import { BaseControl, ColorPicker, PanelBody, SelectControl, TextControl, ToggleControl } from '@wordpress/components';
+import {
+	BaseControl,
+	ColorPicker,
+	PanelBody,
+	SelectControl,
+	TextControl,
+	ToggleControl,
+} from '@wordpress/components';
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -34,8 +41,14 @@ import './editor.scss';
 export default function Edit({ attributes, setAttributes }) {
 	const blockProps = useBlockProps();
 
+	function randomHexId(bytes = 2) {
+		const array = new Uint8Array(bytes);
+		crypto.getRandomValues(array);
+		return Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
+	}
+
 	const {
-		id,
+		id: rawId,
 		title,
 		desc,
 		acceptedFiles,
@@ -58,6 +71,8 @@ export default function Edit({ attributes, setAttributes }) {
 		marginBottom,
 	} = attributes;
 
+	const [id, setId] = useState(rawId);
+
 	let css = '';
 
 	if (borderWidth || borderColor || borderStyle || background || marginBottom) {
@@ -70,7 +85,15 @@ export default function Edit({ attributes, setAttributes }) {
 		${marginBottom ? `margin-bottom: ${marginBottom}px;` : ''}
 	}
 `;
-}
+	}
+
+	useEffect(() => {
+		if (!id) {
+			const randomId = randomHexId();
+			setId(randomId);
+			setAttributes({ id: randomId });
+		}
+	}, []);
 
 	return (
 		<>
@@ -226,7 +249,7 @@ export default function Edit({ attributes, setAttributes }) {
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={__('Border Width', 'wp-dropzone')}
-						type='number'
+						type="number"
 						value={borderWidth}
 						onChange={(value) => setAttributes({ borderWidth: value })}
 					/>
@@ -269,7 +292,7 @@ export default function Edit({ attributes, setAttributes }) {
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={__('Margin Bottom', 'wp-dropzone')}
-						type='number'
+						type="number"
 						value={marginBottom}
 						onChange={(value) => setAttributes({ marginBottom: value })}
 					/>
