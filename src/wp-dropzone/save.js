@@ -6,7 +6,7 @@
  */
 import { useBlockProps } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const {
 		id = '',
 		title = '',
@@ -24,13 +24,19 @@ export default function save( { attributes } ) {
 		thumbnailWidth = 120,
 		thumbnailHeight = 120,
 		thumbnailMethod = 'crop',
+		// Dropzone styles attributes
+		borderWidth,
+		borderStyle,
+		borderColor,
+		background,
+		marginBottom,
 		// Optional attributes that may exist in editor/UI
 		callback = '',
 		domId = '',
 		maxFilesAlert = 'Max file limit exceeded.',
 	} = attributes || {};
 
-	const elementId = `wp-dz-${ id || 'block' }`;
+	const elementId = `wp-dz-${id || 'block'}`;
 
 	// Build config similar to class-plugin.php output. Some dynamic server values
 	// like ajax_url, nonce, and is_user_logged_in cannot be produced here, so we
@@ -44,12 +50,12 @@ export default function save( { attributes } ) {
 		title,
 		desc,
 		max_file_size: '',
-		remove_links: String( !! removeLinks ),
-		clickable: String( !! clickable ),
+		remove_links: String(!!removeLinks),
+		clickable: String(!!clickable),
 		accepted_files: acceptedFiles || null,
 		max_files: maxFiles || null,
 		max_files_alert: maxFilesAlert,
-		auto_process: String( !! autoProcess ),
+		auto_process: String(!!autoProcess),
 		dom_id: domId || '',
 		resize_width: resizeWidth || null,
 		resize_height: resizeHeight || null,
@@ -62,33 +68,44 @@ export default function save( { attributes } ) {
 
 	// Inline CSS for thumbnail sizing similar to shortcode output
 	let css = '';
-	if ( thumbnailWidth && thumbnailHeight ) {
-		css += `.dropzone-${ id || 'block' } .dz-preview .dz-image {width:100%;max-width:${ thumbnailWidth }px;height:auto;max-height:${ thumbnailWidth }px;}`;
+	if (thumbnailWidth && thumbnailHeight) {
+		css += `.dropzone-${id || 'block'} .dz-preview .dz-image {width:100%;max-width:${thumbnailWidth}px;height:auto;max-height:${thumbnailWidth}px;}`;
 	}
+	if (borderWidth || borderColor || borderStyle || background || marginBottom) {
+		css += `
+	.dropzone-${id || 'block'} {
+		${borderWidth ? `border-width: ${borderWidth}px;` : ''}
+		${borderStyle ? `border-style: ${borderStyle};` : ''}
+		${borderColor ? `border-color: ${borderColor};` : ''}
+		${background ? `background: ${background};` : ''}
+		${marginBottom ? `margin-bottom: ${marginBottom}px;` : ''}
+	}
+`;
+}
 
-	const blockProps = useBlockProps.save( { className: '' } );
+	const blockProps = useBlockProps.save({ className: '' });
 
 	return (
-		<div { ...blockProps }>
+		<div {...blockProps}>
 			<div
-				className={`dropzone dropzone-${ id || 'block' }`}
-				id={ elementId }
-				data-config={ JSON.stringify( config ) }
+				className={`dropzone dropzone-${id || 'block'}`}
+				id={elementId}
+				data-config={JSON.stringify(config)}
 			>
-				{ ( title || desc ) && (
+				{(title || desc) && (
 					<div className="dz-message">
-						<h3 className="dropzone-title">{ title }</h3>
-						<p className="dropzone-note">{ desc }</p>
+						<h3 className="dropzone-title">{title}</h3>
+						<p className="dropzone-note">{desc}</p>
 						<div className="dropzone-mobile-trigger needsclick"></div>
 					</div>
-				) }
+				)}
 			</div>
-			{ css && <style>{ css }</style> }
-			{ autoProcess === false && (
-				<button type="button" className="process-upload" id={`process-${ id || 'block' }`}>
-					{ uploadButtonText || 'Upload' }
+			{css && <style>{css}</style>}
+			{autoProcess === false && (
+				<button type="button" className="process-upload" id={`process-${id || 'block'}`}>
+					{uploadButtonText || 'Upload'}
 				</button>
-			) }
+			)}
 		</div>
 	);
 }

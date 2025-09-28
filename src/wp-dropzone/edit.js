@@ -58,6 +58,20 @@ export default function Edit({ attributes, setAttributes }) {
 		marginBottom,
 	} = attributes;
 
+	let css = '';
+
+	if (borderWidth || borderColor || borderStyle || background || marginBottom) {
+		css += `
+	.dropzone-${id || 'block'} {
+		${borderWidth ? `border-width: ${borderWidth}px;` : ''}
+		${borderStyle ? `border-style: ${borderStyle};` : ''}
+		${borderColor ? `border-color: ${borderColor};` : ''}
+		${background ? `background: ${background};` : ''}
+		${marginBottom ? `margin-bottom: ${marginBottom}px;` : ''}
+	}
+`;
+}
+
 	return (
 		<>
 			<InspectorControls>
@@ -274,6 +288,7 @@ export default function Edit({ attributes, setAttributes }) {
 						<div className="dz-default dz-message">Drop files here to upload</div>
 					)}
 				</div>
+				{css && <style>{css}</style>}
 				{autoProcess === false && (
 					<button
 						type="button"
