@@ -89,21 +89,27 @@ class Plugin {
 	public function ajax_upload_handle() {
 		// Verify nonce for security.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_dropzone_nonce' ) ) {
-			wp_send_json_error( __( 'Security check failed.', 'wp-dropzone' ) );
+			wp_send_json_error( __( 'Security check failed.', 'wp-dropzone' ), 403 );
 			return;
 		}
 
-		$message = [
-			'error' => true,
-			'data'  => __( 'no file to upload.', 'wp-dropzone' ),
-		];
+		// Verify user has permission to upload files.
+		if ( ! current_user_can( 'upload_files' ) ) {
+			wp_send_json_error( __( 'You do not have permission to upload files.', 'wp-dropzone' ), 403 );
+			return;
+		}
 
 		if ( ! isset( $_FILES['file'] ) || empty( $_FILES['file'] ) ) {
-			wp_send_json( $message );
+			wp_send_json_error( __( 'no file to upload.', 'wp-dropzone' ), 400 );
+			return;
 		}
 
 		// phpcs:ignore
 		$file = $_FILES['file'];
+
+		// Initialize variables for cleanup.
+		$tmp_file      = null;
+		$wp_filesystem = null;
 
 		// Handle chunked uploads.
 		if ( isset( $_POST['dzuuid'] ) && isset( $_POST['dzchunkindex'] ) && isset( $_POST['dztotalchunkcount'] ) ) {
@@ -111,6 +117,25 @@ class Plugin {
 			$total_chunks = intval( $_POST['dztotalchunkcount'] );
 			$chunk_index  = intval( $_POST['dzchunkindex'] ) + 1;
 			$uploads      = wp_upload_dir();
+
+			// Validate file extension before processing chunks (security fix).
+			$file_extension = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
+
+			// Get allowed file types from WordPress.
+			$allowed_types      = get_allowed_mime_types();
+			$allowed_extensions = [];
+			foreach ( $allowed_types as $ext => $mime ) {
+				$exts               = explode( '|', $ext );
+				$allowed_extensions = array_merge( $allowed_extensions, $exts );
+			}
+
+			// Block dangerous file extensions.
+			$dangerous_extensions = [ 'php', 'php3', 'php4', 'php5', 'phtml', 'phps', 'pht', 'phar', 'shtml', 'htaccess', 'htpasswd', 'sh', 'bash', 'py', 'pl', 'rb', 'js', 'jsp', 'asp', 'aspx', 'exe', 'dll', 'bat', 'cmd', 'com', 'scr', 'vbs', 'wsf' ];
+
+			if ( in_array( $file_extension, $dangerous_extensions, true ) || ! in_array( $file_extension, $allowed_extensions, true ) ) {
+				wp_send_json_error( __( 'File type not allowed.', 'wp-dropzone' ), 400 );
+				return;
+			}
 
 			if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
@@ -123,17 +148,28 @@ class Plugin {
 
 			$wp_filesystem = new WP_Filesystem_Direct( null );
 
+			// Use a safer temporary location with sanitized filename (security fix).
+			$safe_filename = sanitize_file_name( $file['name'] );
+			$tmp_file      = get_temp_dir() . 'wp-dropzone-' . $uid . '-' . $safe_filename;
+
 			// Combine file chunks.
-			$tmp_file = $uploads['path'] . DIRECTORY_SEPARATOR . $file['name'];
-			$contents = $wp_filesystem->get_contents( $tmp_file ) . $wp_filesystem->get_contents( $file['tmp_name'] );
+			$existing_content = '';
+			if ( $wp_filesystem->exists( $tmp_file ) ) {
+				$existing_content = $wp_filesystem->get_contents( $tmp_file );
+			}
+
+			$chunk_content = $wp_filesystem->get_contents( $file['tmp_name'] );
+			$contents      = $existing_content . $chunk_content;
 
 			$wp_filesystem->put_contents( $tmp_file, $contents, false );
 
 			if ( $total_chunks !== $chunk_index ) {
+				wp_send_json_success( [ 'chunk_uploaded' => true ] );
 				return;
 			}
 
-			$file['tmp_name'] = tempnam( $tmp_file, '' );
+			// Final chunk - validate before moving to uploads directory.
+			$file['tmp_name'] = $tmp_file;
 			$file['type']     = isset( $_POST['origtype'] ) ? sanitize_text_field( wp_unslash( $_POST['origtype'] ) ) : '';
 			$file['size']     = $wp_filesystem->size( $tmp_file );
 		}
@@ -151,6 +187,15 @@ class Plugin {
 
 		// Handle successful upload.
 		if ( $movefile && ! isset( $movefile['error'] ) ) {
+			// Clean up temporary chunk file if it exists (security fix).
+			if ( isset( $tmp_file ) && ! empty( $tmp_file ) && file_exists( $tmp_file ) ) {
+				if ( $wp_filesystem && is_a( $wp_filesystem, 'WP_Filesystem_Direct' ) ) {
+					$wp_filesystem->delete( $tmp_file );
+				} else {
+					wp_delete_file( $tmp_file );
+				}
+			}
+
 			// Fire hook after upload.
 			do_action( 'wp_dropzone_after_upload_file', $file );
 
@@ -180,10 +225,21 @@ class Plugin {
 				wp_update_attachment_metadata( $attachment_id, $attachment_data );
 			}
 
-			$message['error'] = false;
-			$message['data']  = wp_get_attachment_url( $attachment_id );
+			$message = [
+				'error' => false,
+				'data'  => wp_get_attachment_url( $attachment_id ),
+			];
 		} else {
-			$message['data'] = $movefile['error'];
+			// Clean up temporary chunk file on error (security fix).
+			if ( isset( $tmp_file ) && ! empty( $tmp_file ) && file_exists( $tmp_file ) ) {
+				if ( $wp_filesystem && is_a( $wp_filesystem, 'WP_Filesystem_Direct' ) ) {
+					$wp_filesystem->delete( $tmp_file );
+				} else {
+					wp_delete_file( $tmp_file );
+				}
+			}
+			wp_send_json_error( $movefile['error'], 400 );
+			return;
 		}
 
 		wp_send_json( $message );
@@ -234,12 +290,15 @@ class Plugin {
 
 		if ( ! is_user_logged_in() ) {
 			$atts['desc'] = __( 'Please login to upload files.', 'wp-dropzone' );
+		} elseif ( ! current_user_can( 'upload_files' ) ) {
+			$atts['desc'] = __( 'You do not have permission to upload files.', 'wp-dropzone' );
 		}
 
 		$configs = [
 			'ajax_url'          => esc_url( admin_url( 'admin-ajax.php' ) ),
 			'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
 			'is_user_logged_in' => is_user_logged_in(),
+			'can_upload_files'  => current_user_can( 'upload_files' ),
 			'id'                => $atts['id'],
 			'callback'          => $atts['callback'],
 			'title'             => $atts['title'],
