@@ -55,6 +55,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					// Handle manual processing when auto_process is false
 					if ( configData.auto_process === 'false' ) {
 						const processButton = document.getElementById( 'process-' + configData.id );
+
 						if ( processButton ) {
 							processButton.addEventListener( 'click', function () {
 								closure.processQueue();
@@ -79,9 +80,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 							callback = callback.trim();
 							if ( callback ) {
 								const parts = callback.split( /\s?:\s?/ );
+
 								if ( parts.length === 2 ) {
 									try {
 										const func = new Function( 'return ' + parts[ 1 ] )();
+
 										closure.on( parts[ 0 ], func );
 									} catch ( e ) {
 										console.warn(
@@ -131,6 +134,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				success( file, response ) {
 					// Parse response if it's a string
 					let parsedResponse = response;
+
 					if ( typeof response === 'string' ) {
 						try {
 							parsedResponse = JSON.parse( response );
@@ -149,6 +153,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 							! parsedResponse.error
 						) {
 							const targetElement = document.getElementById( configData.dom_id );
+
 							if ( targetElement ) {
 								targetElement.value = parsedResponse.data;
 							}
@@ -172,6 +177,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					if ( xhr && xhr.responseText ) {
 						try {
 							const response = JSON.parse( xhr.responseText );
+
 							if ( response.data ) {
 								errorMessage = response.data;
 							} else if ( response.error ) {
@@ -208,6 +214,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 						// Set error message in preview element
 						const errorNodes =
 							file.previewElement.querySelectorAll( '[data-dz-errormessage]' );
+
 						errorNodes.forEach( function ( node ) {
 							node.textContent = errorMessage;
 						} );
