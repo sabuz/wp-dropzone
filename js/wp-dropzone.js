@@ -143,7 +143,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					// Handle successful upload
 					// WordPress now sends proper HTTP error status codes, so errors go to error callback
 					if ( configData.dom_id && configData.dom_id.length > 0 ) {
-						if ( parsedResponse.error == 'false' || parsedResponse.error === false || ! parsedResponse.error ) {
+						if (
+							parsedResponse.error == 'false' ||
+							parsedResponse.error === false ||
+							! parsedResponse.error
+						) {
 							const targetElement = document.getElementById( configData.dom_id );
 							if ( targetElement ) {
 								targetElement.value = parsedResponse.data;
@@ -163,7 +167,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					// Handle WordPress error response format
 					// wp_send_json_error() sends {success: false, data: "message"}
 					let errorMessage = message;
-					
+
 					// Try to extract error message from XHR response if available
 					if ( xhr && xhr.responseText ) {
 						try {
@@ -177,7 +181,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 							// Not JSON, use original message
 						}
 					}
-					
+
 					// Handle if message is an object
 					if ( typeof errorMessage === 'object' && errorMessage !== null ) {
 						if ( errorMessage.data ) {
@@ -190,24 +194,25 @@ document.addEventListener( 'DOMContentLoaded', function () {
 							errorMessage = 'Upload failed. Please try again.';
 						}
 					}
-					
+
 					// Ensure errorMessage is a string
 					if ( typeof errorMessage !== 'string' ) {
 						errorMessage = String( errorMessage );
 					}
-					
+
 					// Manually set error state to ensure Dropzone displays the error
 					if ( file.previewElement ) {
 						file.previewElement.classList.add( 'dz-error' );
 						file.previewElement.classList.remove( 'dz-success', 'dz-complete' );
-						
+
 						// Set error message in preview element
-						const errorNodes = file.previewElement.querySelectorAll( '[data-dz-errormessage]' );
-						errorNodes.forEach( function( node ) {
+						const errorNodes =
+							file.previewElement.querySelectorAll( '[data-dz-errormessage]' );
+						errorNodes.forEach( function ( node ) {
 							node.textContent = errorMessage;
 						} );
 					}
-					
+
 					// Set file status to error
 					file.status = Dropzone.ERROR;
 				},
