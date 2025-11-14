@@ -4,7 +4,7 @@ Tags: dropzone, file upload, image upload, media upload, media
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: <https://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -244,6 +244,19 @@ Check your server's PHP upload limits (upload_max_filesize, post_max_size), ensu
 
 == Changelog ==
 
+= 1.1.1 =
+
+* **SECURITY FIX** - Fixed authenticated arbitrary file upload vulnerability (CVE-2025-12775)
+* Added: Capability check requiring `upload_files` permission for all file uploads
+* Added: File type validation before writing chunks to disk
+* Added: Dangerous file extension blacklist to prevent execution of malicious files
+* Added: Temporary file cleanup on success and error
+* Improved: Chunked upload security by using system temp directory instead of uploads directory
+* Improved: File validation now occurs before any disk writes
+* Improved: Error handling in JavaScript to correctly display WordPress `wp_send_json_error` responses in Dropzone UI
+* Improved: PHP backend now sends proper HTTP error status codes (400, 403) for upload failures
+* Improved: Dropzone area is now disabled for users without upload permissions
+
 = 1.1.0 =
 
 * Added: FSE theme support
@@ -294,6 +307,9 @@ Check your server's PHP upload limits (upload_max_filesize, post_max_size), ensu
 * Initial release with basic functionality
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+**SECURITY UPDATE** - Critical security fix for authenticated arbitrary file upload vulnerability (CVE-2025-12775). All users should update immediately. This update adds capability checks, file validation, and improved security measures.
 
 = 1.1.0 =
 Major update with FSE theme support, improved security, and translation support.

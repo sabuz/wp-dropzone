@@ -62,8 +62,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 						}
 					}
 
-					// Disable dropzone if user is not logged in
+					// Disable dropzone if user is not logged in or doesn't have upload permission
 					if ( Boolean( configData.is_user_logged_in ) !== true ) {
+						this.disable();
+					} else if ( Boolean( configData.can_upload_files ) !== true ) {
 						this.disable();
 					}
 
@@ -101,7 +103,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				 * @param {FormData}       data - The upload data being sent
 				 */
 				sending( file, xhr, data ) {
-					data.append( 'nonce', configData.nonce );
+					data.append( 'nonce', configData.nonce || '' );
 					data.append( 'origtype', file.type );
 				},
 				/**
@@ -127,14 +129,87 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				 * @param {Object} response - Server response with upload result
 				 */
 				success( file, response ) {
+					// Parse response if it's a string
+					let parsedResponse = response;
+					if ( typeof response === 'string' ) {
+						try {
+							parsedResponse = JSON.parse( response );
+						} catch ( e ) {
+							console.error( 'WP Dropzone: Failed to parse response', e );
+							parsedResponse = response;
+						}
+					}
+
+					// Handle successful upload
+					// WordPress now sends proper HTTP error status codes, so errors go to error callback
 					if ( configData.dom_id && configData.dom_id.length > 0 ) {
-						if ( response.error == 'false' ) {
+						if ( parsedResponse.error == 'false' || parsedResponse.error === false || ! parsedResponse.error ) {
 							const targetElement = document.getElementById( configData.dom_id );
 							if ( targetElement ) {
-								targetElement.value = response.data;
+								targetElement.value = parsedResponse.data;
 							}
 						}
 					}
+				},
+				/**
+				 * Upload error callback
+				 *
+				 * Handles upload errors and displays them in the Dropzone UI.
+				 * @param {File}           file    - The file that failed to upload
+				 * @param {string|Object}  message - Error message or response object
+				 * @param {XMLHttpRequest} xhr     - The XMLHttpRequest object
+				 */
+				error( file, message, xhr ) {
+					// Handle WordPress error response format
+					// wp_send_json_error() sends {success: false, data: "message"}
+					let errorMessage = message;
+					
+					// Try to extract error message from XHR response if available
+					if ( xhr && xhr.responseText ) {
+						try {
+							const response = JSON.parse( xhr.responseText );
+							if ( response.data ) {
+								errorMessage = response.data;
+							} else if ( response.error ) {
+								errorMessage = response.error;
+							}
+						} catch ( e ) {
+							// Not JSON, use original message
+						}
+					}
+					
+					// Handle if message is an object
+					if ( typeof errorMessage === 'object' && errorMessage !== null ) {
+						if ( errorMessage.data ) {
+							errorMessage = errorMessage.data;
+						} else if ( errorMessage.error ) {
+							errorMessage = errorMessage.error;
+						} else if ( errorMessage.message ) {
+							errorMessage = errorMessage.message;
+						} else {
+							errorMessage = 'Upload failed. Please try again.';
+						}
+					}
+					
+					// Ensure errorMessage is a string
+					if ( typeof errorMessage !== 'string' ) {
+						errorMessage = String( errorMessage );
+					}
+					
+					// Manually set error state to ensure Dropzone displays the error
+					if ( file.previewElement ) {
+						file.previewElement.classList.add( 'dz-error' );
+						file.previewElement.classList.remove( 'dz-success', 'dz-complete' );
+						
+						// Set error message in preview element
+						const errorNodes = file.previewElement.querySelectorAll( '[data-dz-errormessage]' );
+						errorNodes.forEach( function( node ) {
+							node.textContent = errorMessage;
+						} );
+					}
+					
+					// Set file status to error
+					file.status = Dropzone.ERROR;
 				},
 			} );
 		} catch ( error ) {
