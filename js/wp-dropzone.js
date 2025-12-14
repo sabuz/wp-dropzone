@@ -70,31 +70,135 @@ document.addEventListener( 'DOMContentLoaded', function () {
 						this.disable();
 					}
 
-					// Parse and register custom callbacks
-					if ( configData.callback && configData.callback.trim() ) {
-						const callbacks = configData.callback
-							.replace( /(})\s?,/, '},##' )
-							.split( ',##' );
+					// Parse and register custom callbacks with security validation
+					if (
+						configData.callback &&
+						typeof configData.callback === 'string' &&
+						configData.callback.trim()
+					) {
+						// Whitelist of allowed Dropzone event names
+						const allowedEvents = [
+							'addedfile',
+							'removedfile',
+							'thumbnail',
+							'error',
+							'errormultiple',
+							'success',
+							'successmultiple',
+							'processing',
+							'processingmultiple',
+							'uploadprogress',
+							'totaluploadprogress',
+							'sending',
+							'sendingmultiple',
+							'queuecomplete',
+							'complete',
+							'completemultiple',
+							'canceled',
+							'canceledmultiple',
+							'maxfilesreached',
+							'maxfilesexceeded',
+							'dragenter',
+							'dragover',
+							'dragleave',
+							'drop',
+							'paste',
+							'reset',
+							'init',
+						];
 
-						callbacks.forEach( function ( callback ) {
-							callback = callback.trim();
-							if ( callback ) {
-								const parts = callback.split( /\s?:\s?/ );
+						// Split callbacks by comma, handling function closures
+						const callbackPattern =
+							/\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*function\s*\([^)]*\)\s*\{[^}]*\}\s*/g;
+						const matches = configData.callback.matchAll( callbackPattern );
 
-								if ( parts.length === 2 ) {
-									try {
-										const func = new Function( 'return ' + parts[ 1 ] )();
+						for ( const match of matches ) {
+							// Validate match structure exists
+							if ( ! match || ! match[ 1 ] || ! match[ 0 ] ) {
+								continue;
+							}
 
-										closure.on( parts[ 0 ], func );
-									} catch ( e ) {
+							const eventName = match[ 1 ].trim();
+							const fullMatch = match[ 0 ].trim();
+
+							// Validate event name and full match are not empty
+							if ( ! eventName || ! fullMatch ) {
+								continue;
+							}
+
+							// Validate event name is in whitelist
+							if ( ! allowedEvents.includes( eventName ) ) {
+								console.warn(
+									'WP Dropzone: Invalid event name in callback:',
+									eventName,
+								);
+								continue;
+							}
+
+							// Additional security check: block only the most dangerous patterns
+							// Allow legitimate DOM manipulation (getElementById, querySelector, .value, etc.)
+							const dangerousPatterns = [
+								/eval\s*\(/i,
+								/new\s+Function\s*\(/i,
+								/setTimeout\s*\(\s*["']/i,
+								/setInterval\s*\(\s*["']/i,
+								/document\.write\s*\(/i,
+								/document\.writeln\s*\(/i,
+								/\.innerHTML\s*=/i,
+								/\.outerHTML\s*=/i,
+								/insertAdjacentHTML\s*\(/i,
+								/<script/i,
+								/javascript:/i,
+							];
+
+							let isSafe = true;
+							for ( const pattern of dangerousPatterns ) {
+								if ( pattern.test( fullMatch ) ) {
+									isSafe = false;
+									break;
+								}
+							}
+
+							if ( ! isSafe ) {
+								console.warn(
+									'WP Dropzone: Dangerous pattern detected in callback, skipping:',
+									eventName,
+								);
+								continue;
+							}
+
+							// Extract and validate function
+							try {
+								// Use a safer approach: parse the function string
+								const funcMatch = fullMatch.match(
+									/function\s*\([^)]*\)\s*\{([^}]*)\}/,
+								);
+								if ( funcMatch ) {
+									// Create function using safer method
+									// Only allow if it matches the expected pattern
+									const funcString = fullMatch.substring(
+										fullMatch.indexOf( 'function' ),
+									);
+									const func = new Function( 'return ' + funcString )();
+
+									// Validate it's actually a function
+									if ( typeof func === 'function' ) {
+										closure.on( eventName, func );
+									} else {
 										console.warn(
-											'WP Dropzone: Invalid callback function:',
-											parts[ 1 ],
+											'WP Dropzone: Callback did not evaluate to a function:',
+											eventName,
 										);
 									}
 								}
+							} catch ( e ) {
+								console.warn(
+									'WP Dropzone: Invalid callback function:',
+									eventName,
+									e,
+								);
 							}
-						} );
+						}
 					}
 				},
 				/**
