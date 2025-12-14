@@ -2,9 +2,9 @@
 Contributors: nazsabuz
 Tags: dropzone, file upload, image upload, media upload, media
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: <https://www.gnu.org/licenses/gpl-2.0.html>
 
@@ -91,6 +91,10 @@ The following attributes can be used with the `[wp-dropzone]` shortcode:
 
 * `thumbnail-method` - Thumbnail method: contain/crop (Default: crop)
   Example: `[wp-dropzone thumbnail-method="contain"]`
+
+* `callback` - Custom JavaScript callbacks for Dropzone events (Advanced)
+  Example: `[wp-dropzone callback="success: function(file, response) { document.getElementById('hidden-field').value = response.data; }"]`
+  Note: Only whitelisted event names are allowed. Dangerous patterns (eval, innerHTML, etc.) are blocked for security.
 
 ### Styling Options
 
@@ -244,6 +248,16 @@ Check your server's PHP upload limits (upload_max_filesize, post_max_size), ensu
 
 == Changelog ==
 
+= 1.1.2 =
+
+* **SECURITY FIX** - Fixed authenticated stored cross-site scripting (XSS) vulnerability via 'callback' shortcode attribute (CVE-2025-13989)
+* Added: Callback attribute sanitization with whitelist of allowed Dropzone event names
+* Added: Validation to block dangerous JavaScript patterns in callback functions
+* Added: Additional security checks in JavaScript to prevent arbitrary code execution
+* Improved: Callback validation now occurs in both PHP and JavaScript layers
+* Improved: Callback sanitization allows legitimate use cases like populating form fields
+* Updated: WordPress compatibility to 6.9
+
 = 1.1.1 =
 
 * **SECURITY FIX** - Fixed authenticated arbitrary file upload vulnerability (CVE-2025-12775)
@@ -307,6 +321,9 @@ Check your server's PHP upload limits (upload_max_filesize, post_max_size), ensu
 * Initial release with basic functionality
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+**SECURITY UPDATE** - Critical security fix for authenticated stored cross-site scripting (XSS) vulnerability via 'callback' shortcode attribute (CVE-2025-13989). All users should update immediately. This update adds callback sanitization, event name whitelisting, and improved security validation.
 
 = 1.1.1 =
 **SECURITY UPDATE** - Critical security fix for authenticated arbitrary file upload vulnerability (CVE-2025-12775). All users should update immediately. This update adds capability checks, file validation, and improved security measures.

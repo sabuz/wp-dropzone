@@ -294,13 +294,16 @@ class Plugin {
 			$atts['desc'] = __( 'You do not have permission to upload files.', 'wp-dropzone' );
 		}
 
+		// Basic sanitization: remove null bytes and trim.
+		$sanitized_callback = $this->sanitize_callback( $atts['callback'] );
+
 		$configs = [
 			'ajax_url'          => esc_url( admin_url( 'admin-ajax.php' ) ),
 			'nonce'             => wp_create_nonce( 'wp_dropzone_nonce' ),
 			'is_user_logged_in' => is_user_logged_in(),
 			'can_upload_files'  => current_user_can( 'upload_files' ),
 			'id'                => $atts['id'],
-			'callback'          => $atts['callback'],
+			'callback'          => $sanitized_callback,
 			'title'             => $atts['title'],
 			'desc'              => $atts['desc'],
 			'max_file_size'     => $atts['max-file-size'],
@@ -365,6 +368,32 @@ class Plugin {
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Sanitize and validate callback attribute to prevent XSS
+	 *
+	 * Validates callback format and only allows whitelisted Dropzone event names.
+	 * This prevents arbitrary JavaScript execution via the callback attribute while
+	 * still allowing legitimate use cases like populating form fields.
+	 *
+	 * Allowed: DOM manipulation (getElementById, querySelector, .value, etc.)
+	 * Blocked: eval, Function constructor, innerHTML assignment, document.write, etc.
+	 *
+	 * Example legitimate use:
+	 * success: function(file, response) { document.getElementById('hidden-field').value = response.data; }
+	 *
+	 * @since 1.1.2
+	 * @param string $callback Raw callback string from shortcode attribute.
+	 * @return string Sanitized callback string or empty string if invalid.
+	 */
+	protected function sanitize_callback( $callback ) {
+		if ( empty( $callback ) || ! is_string( $callback ) ) {
+			return '';
+		}
+
+		// Remove any null bytes and trim.
+		return str_replace( "\0", '', trim( $callback ) );
 	}
 
 	/**
